@@ -27,13 +27,14 @@ public class App
             PresenceParser pp = new PresenceParser();
             //Document doc2=pp.getDocument(417L, 170L);
             //Long personId=2L;
-            Long firstPerson=128L;
+            Long firstPerson=131L;
             Long maxPerson = 418L;
             int maxRetry=10;
 
             for (Long personId = firstPerson; personId <= maxPerson; personId++) {
                 int retryIndex=0;
                 boolean success=false;
+                int sleepTime=10000;
                 while (!success && retryIndex<maxRetry)
                 {
                 try{
@@ -50,7 +51,8 @@ public class App
                     logger.warning("Error " + ex.getMessage());
                     logger.info("Retrying " + retryIndex + "/" + maxRetry);
                     retryIndex++;
-                    Thread.sleep(10000);
+                    Thread.sleep(sleepTime);
+                    sleepTime*=2;
 
                 }
                 }
