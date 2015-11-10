@@ -38,7 +38,7 @@ public class PresenceParser {
         CloseableHttpClient httpclient = HttpClients.custom().setRetryHandler(new DefaultHttpRequestRetryHandler(5, true))
                 .build();
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(5000).setConnectTimeout(5000).setSocketTimeout(2000).build();
+                .setConnectionRequestTimeout(9000).setConnectTimeout(9000).setSocketTimeout(9000).build();
 
 
 

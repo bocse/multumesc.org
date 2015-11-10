@@ -27,7 +27,7 @@ public class App
             PresenceParser pp = new PresenceParser();
             //Document doc2=pp.getDocument(417L, 170L);
             //Long personId=2L;
-            Long firstPerson=120L;
+            Long firstPerson=128L;
             Long maxPerson = 418L;
             int maxRetry=10;
 
