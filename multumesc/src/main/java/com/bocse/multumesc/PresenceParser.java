@@ -18,6 +18,7 @@ import java.io.IOException;
 public class PresenceParser {
 
     public Document getDocument() throws IOException {
+        final String url="http://www.cdep.ro/pls/steno/eVot.mp";
         CloseableHttpClient httpclient = HttpClients.createDefault();
         try {
             //HttpGet httpget = new HttpGet("http://httpbin.org/");
@@ -27,7 +28,7 @@ public class PresenceParser {
             // Create a custom response handler
             ResponseHandler<String> responseHandler = new ResponseHandler<String>() {
 
-                @Override
+
                 public String handleResponse(
                         final HttpResponse response) throws ClientProtocolException, IOException {
                     int status = response.getStatusLine().getStatusCode();
