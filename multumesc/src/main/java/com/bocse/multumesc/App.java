@@ -1,70 +1,58 @@
 package com.bocse.multumesc;
 
 
+import com.bocse.multumesc.data.Person;
+import com.bocse.multumesc.parser.PresenceParser;
+import com.bocse.multumesc.serializer.JsonSerializer;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.FileConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
-
-import org.json.simple.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
+import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 /**
- * Hello world!
- *
+ * Multumesc Main app.
  */
-public class App 
-{
+public class App {
     final static Logger logger = Logger.getLogger(App.class.toString());
-    public static void main( String[] args ) throws IOException, InterruptedException {
-        //System.out.println( "Hello World!" );
-        //Document doc2= Jsoup.
+    public final static FileConfiguration configuration = new PropertiesConfiguration();
 
-            PresenceParser pp = new PresenceParser();
-            //Document doc2=pp.getDocument(417L, 170L);
-            //Long personId=2L;
-            Long firstPerson=131L;
-            Long maxPerson = 418L;
-            int maxRetry=10;
+    public static void main(String[] args) throws IOException, InterruptedException, ConfigurationException {
 
-            for (Long personId = firstPerson; personId <= maxPerson; personId++) {
-                int retryIndex=0;
-                boolean success=false;
-                int sleepTime=10000;
-                while (!success && retryIndex<maxRetry)
-                {
-                try{
-                List<Map<String, Object>> map = pp.getPerson(personId);
-                JSONObject object = new JSONObject();
-                object.put("personId", personId);
-                object.put("voteData", map);
-                JsonSerializer jser = new JsonSerializer();
-                jser.serialize("C:\\Temp\\Cdep\\", personId, object);
-                Thread.sleep((int) (5000 + System.nanoTime() % 2000));
-                success=true;
-                }
-                catch (Exception ex) {
-                    logger.warning("Error " + ex.getMessage());
-                    logger.info("Retrying " + retryIndex + "/" + maxRetry);
-                    retryIndex++;
-                    Thread.sleep(sleepTime);
-                    sleepTime*=2;
+        configuration.load(args[0]);
 
-                }
-                }
+
+        JsonSerializer jser = new JsonSerializer();
+
+        PresenceParser pp = new PresenceParser();
+        Long firstPerson = configuration.getLong("assumptions.firstPerson", 1);
+        Long maxPerson = configuration.getLong("assumptions.lastPerson", 418);
+
+        SortedMap<Long, String> subjectMatters = new TreeMap<>();
+        for (Long personId = firstPerson; personId <= maxPerson; personId++) {
+
+            try {
+                Person person = new Person();
+                person.setPersonId(personId);
+                pp.getPersonVotes(person, subjectMatters);
+                pp.getPersonProfile(person);
+                //List<Map<String, Object>> map = pp.getPerson(person, );
+                //object.put("voteData", map);
+
+                jser.serialize(configuration.getString("output.profile.path"), personId, person);
+                jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
+                Thread.sleep((int) (1 + System.nanoTime() % 1000));
+            } finally {
+
             }
 
+        }
 
-//        System.exit(0);
-//        Document doc = Jsoup.connect("http://en.wikipedia.org/").get();
-//        Elements newsHeadlines = doc.select("#mp-itn b a");
-//        for (int i = 0; i < newsHeadlines.size(); i++) {
-//            logger.info(newsHeadlines.get(i).text());
-//        }
-//        logger.info(newsHeadlines.last().text());
+
     }
 }
