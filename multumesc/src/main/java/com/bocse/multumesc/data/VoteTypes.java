@@ -5,7 +5,8 @@ package com.bocse.multumesc.data;
  */
 public enum VoteTypes {
 
-        FOR, AGAINST, ABSTAIN, ABSENT, NONE, UNKNOWN
+        FOR, AGAINST, ABSTAIN, ABSENT, NONE, UNKNOWN,
+        TOTAL
 
 
 }
