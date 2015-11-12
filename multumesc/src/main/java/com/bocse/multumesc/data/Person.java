@@ -1,7 +1,5 @@
 package com.bocse.multumesc.data;
 
-import org.apache.commons.lang.mutable.MutableLong;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -13,8 +11,9 @@ public class Person  {
     private Long personId;
     private String name;
     private String currentParty;
-    private List<String> previousPartyList=new ArrayList<>();
+    private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
+    private Long lastUpdateTimestamp=0L;
     private Map<VoteTypes, AtomicLong> statsLast30Days=new ConcurrentHashMap<>();
     private Map<VoteTypes, AtomicLong> statsLast90Days=new ConcurrentHashMap<>();
     private Map<VoteTypes, AtomicLong> statsLast365Days=new ConcurrentHashMap<>();
@@ -53,12 +52,12 @@ public class Person  {
         this.currentParty = currentParty;
     }
 
-    public List<String> getPreviousPartyList() {
-        return previousPartyList;
+    public List<String> getAllPartyList() {
+        return allPartyList;
     }
 
-    public void setPreviousPartyList(List<String> previousPartyList) {
-        this.previousPartyList = previousPartyList;
+    public void setAllPartyList(List<String> allPartyList) {
+        this.allPartyList = allPartyList;
     }
 
 
@@ -92,5 +91,13 @@ public class Person  {
 
     public void setStatsAllTerm(Map<VoteTypes, AtomicLong> statsAllTerm) {
         this.statsAllTerm = statsAllTerm;
+    }
+
+    public Long getLastUpdateTimestamp() {
+        return lastUpdateTimestamp;
+    }
+
+    public void setLastUpdateTimestamp(Long lastUpdateTimestamp) {
+        this.lastUpdateTimestamp = lastUpdateTimestamp;
     }
 }

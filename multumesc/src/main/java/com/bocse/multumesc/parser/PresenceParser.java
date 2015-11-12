@@ -244,11 +244,10 @@ public class PresenceParser {
             String partyString=elements.get(elementIndex).text();
             String[] partyParts=partyString.split(" - ");
             person.setCurrentParty(partyParts[0].trim().toUpperCase());
-            person.getPreviousPartyList().add(partyParts[0].trim().toUpperCase());
+            person.getAllPartyList().add(partyParts[0].trim().toUpperCase());
             logger.info(partyString);
         }
-        //12
-        //Formaţiunea politică:
+
         logger.info(""+elements.size());
         return foundElements;
     }
@@ -264,10 +263,12 @@ public class PresenceParser {
             logger.info("Finished parsing page " + index);
             index++;
          } while (keepGoing);
+        person.setLastUpdateTimestamp(System.currentTimeMillis());
     }
 
     public void getPersonProfile(Person person) throws IOException, InterruptedException {
         parserProfileDocument(person, getProfileDocument(person.getPersonId()));
+        person.setLastUpdateTimestamp(System.currentTimeMillis());
     }
 
 }

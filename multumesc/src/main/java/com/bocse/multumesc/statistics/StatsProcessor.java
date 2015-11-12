@@ -5,6 +5,7 @@ import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
 import org.joda.time.DateTime;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,5 +55,96 @@ public class StatsProcessor {
                 map.get(VoteTypes.TOTAL).incrementAndGet();
         }
         return map;
+    }
+
+    public Map<String, Map<VoteTypes, AtomicLong>> processPartyFromPerson(Map<String, Map<VoteTypes, AtomicLong>> previousState,List<Person> persons, int period)
+    {
+
+
+        Map<String, Map<VoteTypes, AtomicLong>> votesByParty=null;
+        if (previousState!=null)
+            votesByParty=previousState;
+        else
+            votesByParty=new ConcurrentHashMap<>();
+
+        for(Person person : persons)
+        {
+
+            Map<VoteTypes, AtomicLong> chosenMap;
+            switch (period)
+            {
+                case 30:
+                    chosenMap=person.getStatsLast30Days();
+                    break;
+                case 90:
+                    chosenMap=person.getStatsLast90Days();
+                    break;
+                case 365:
+                    chosenMap=person.getStatsLast365Days();
+                    break;
+                case -1:
+                    chosenMap=person.getStatsAllTerm();
+                    break;
+                default:
+                    throw new IllegalStateException("Period not supported in this method "+period);
+            }
+
+            String party=person.getCurrentParty();
+            Map<VoteTypes, AtomicLong> partyVotes;
+            if (!votesByParty.containsKey(party)) {
+                partyVotes=initMap();
+                votesByParty.put(party, partyVotes);
+            }
+            else
+            {
+                partyVotes=votesByParty.get(party);
+            }
+
+            for (Map.Entry<VoteTypes, AtomicLong> vote :person.getStatsLast90Days().entrySet())
+            {
+                partyVotes.get(vote.getKey()).addAndGet(vote.getValue().get());
+            }
+
+        }
+        return votesByParty;
+    }
+
+    public Map<String, Map<VoteTypes, AtomicLong>> processPartyFromVotes(Map<String, Map<VoteTypes, AtomicLong>> previousState,List<Person> persons, DateTime startDate, DateTime endDate)
+    {
+        Long startTimestamp=startDate.getMillis();
+        Long endTimestamp=endDate.getMillis();
+
+        Map<String, Map<VoteTypes, AtomicLong>> votesByParty=null;
+        if (previousState!=null)
+            votesByParty=previousState;
+        else
+            votesByParty=new ConcurrentHashMap<>();
+
+        for(Person person : persons)
+        {
+
+
+            String party=person.getCurrentParty();
+            Map<VoteTypes, AtomicLong> partyVotes;
+            if (!votesByParty.containsKey(party)) {
+                partyVotes=initMap();
+                votesByParty.put(party, partyVotes);
+            }
+            else
+            {
+                partyVotes=votesByParty.get(party);
+            }
+
+            for (Map.Entry<Long, Vote> vote :person.getVoteMap().entrySet())
+            {
+                Long timestamp=vote.getValue().getTimestamp();
+                if (timestamp>=startTimestamp && timestamp<=endTimestamp) {
+                    partyVotes.get(vote.getValue().getValue()).incrementAndGet();
+                    partyVotes.get(VoteTypes.TOTAL).incrementAndGet();
+                }
+            }
+
+        }
+        return votesByParty;
     }
 }

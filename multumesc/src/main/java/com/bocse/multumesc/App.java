@@ -16,10 +16,8 @@ import org.joda.time.DateTime;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
 
@@ -30,6 +28,9 @@ public class App {
     final static Logger logger = Logger.getLogger(App.class.toString());
     public final static FileConfiguration configuration = new PropertiesConfiguration();
     public final static FileConfiguration state=new PropertiesConfiguration();
+    public final static Map<String, Map<VoteTypes, AtomicLong>> partyVotes=new ConcurrentHashMap<>();
+    public final static Map<String, Map<VoteTypes, AtomicLong>> partyVotes2=new ConcurrentHashMap<>();
+
     public static void main(String[] args) throws IOException, InterruptedException, ConfigurationException {
         if (new File(args[1]).exists())
             state.load(args[1]);
@@ -77,6 +78,24 @@ public class App {
                 person.setVoteMap(tempVote);
                 jser.serialize(configuration.getString("output.profile.path"), personId, person);
                 jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
+
+
+                //Compute party - version 1
+                List<Person> personWrapper=new ArrayList<>();
+                personWrapper.add(person);
+                Map<Integer, Map<String, Map<VoteTypes, AtomicLong>>> partyResults=new HashMap<>();
+                partyResults.put(30,stats.processPartyFromPerson(partyVotes, personWrapper, 30));
+                partyResults.put(90, stats.processPartyFromPerson(partyVotes, personWrapper, 90));
+                partyResults.put(365, stats.processPartyFromPerson(partyVotes, personWrapper, 365));
+                partyResults.put(-1,stats.processPartyFromPerson(partyVotes, personWrapper, -1));
+                jser.serialize(configuration.getString("output.partyStats.path"), 1L, partyResults);
+
+                partyResults=new HashMap<>();
+                partyResults.put(30, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(30), new DateTime() ));
+                partyResults.put(90, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(90), new DateTime() ));
+                partyResults.put(365, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(365), new DateTime() ));
+                partyResults.put(-1, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(9999), new DateTime() ));
+                jser.serialize(configuration.getString("output.partyStats.path"), 2L, partyResults);
                 state.setProperty("partialCrawls.lastProfile", personId);
                 Thread.sleep((int) (1 + System.nanoTime() % 1000));
             } finally {
