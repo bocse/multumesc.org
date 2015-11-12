@@ -100,7 +100,7 @@ public class StatsProcessor {
                 partyVotes=votesByParty.get(party);
             }
 
-            for (Map.Entry<VoteTypes, AtomicLong> vote :person.getStatsLast90Days().entrySet())
+            for (Map.Entry<VoteTypes, AtomicLong> vote :chosenMap.entrySet())
             {
                 partyVotes.get(vote.getKey()).addAndGet(vote.getValue().get());
             }

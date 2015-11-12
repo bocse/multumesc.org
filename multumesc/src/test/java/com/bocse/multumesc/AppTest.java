@@ -3,6 +3,7 @@ package com.bocse.multumesc;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
+import com.bocse.multumesc.parser.ParsingConstants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import junit.framework.Test;
@@ -10,6 +11,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.joda.time.DateTime;
 
+import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
@@ -60,5 +62,17 @@ public class AppTest
 
         System.out.println(p.getVoteMap().get(10L).getValue());
 
+    }
+
+
+    public void testRegex()
+    {
+        String[] sarray={" independent\t \t - din feb. 2014\n", "PDL\t-\tPartidul Democrat Liberal\t - până în feb. 2014\n",
+        "\t\n" +
+                "VERZII\t-\tPartidul Verde\n"};
+        for (int i=0; i<sarray.length; i++) {
+            String[] split = sarray[i].split("\\s*\\t*" + "-" + "\\s*\\t*\\n*");
+            System.out.println(Arrays.toString(split));
+        }
     }
 }

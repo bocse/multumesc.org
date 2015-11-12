@@ -37,6 +37,7 @@ import java.util.logging.Logger;
  */
 public class PresenceParser {
 
+
     private final static Long maxAttempts=10L;
     private final static Long initialDelay=1300L;
     private final static Double backoffExponent=1.9;
@@ -242,9 +243,15 @@ public class PresenceParser {
         for (int elementIndex=0; elementIndex<elements.size(); elementIndex++)
         {
             String partyString=elements.get(elementIndex).text();
-            String[] partyParts=partyString.split(" - ");
-            person.setCurrentParty(partyParts[0].trim().toUpperCase());
-            person.getAllPartyList().add(partyParts[0].trim().toUpperCase());
+            String[] partyParts=partyString.split("[\\n*\\s*\\t*]+" + "-" + "[\\n*\\s*\\t*]+");
+            String partyInitials=partyParts[0].trim().replaceAll("[\\n*\\t*\\n*\\r*\\n*]+", "").replaceAll("\u00A0", "").trim().toUpperCase();
+
+            //TODO: replace this workaround with something smarter
+            if (partyInitials.contains("INDEPENDENT"))
+                partyInitials="INDEPENDENT";
+
+            person.setCurrentParty(partyInitials);
+            person.getAllPartyList().add(partyInitials);
             logger.info(partyString);
         }
 
