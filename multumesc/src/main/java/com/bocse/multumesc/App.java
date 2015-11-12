@@ -2,6 +2,7 @@ package com.bocse.multumesc;
 
 
 import com.bocse.multumesc.data.Person;
+import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
 import com.bocse.multumesc.parser.PresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
@@ -30,7 +31,8 @@ public class App {
     public final static FileConfiguration configuration = new PropertiesConfiguration();
     public final static FileConfiguration state=new PropertiesConfiguration();
     public static void main(String[] args) throws IOException, InterruptedException, ConfigurationException {
-        state.load(args[1]);
+        if (new File(args[1]).exists())
+            state.load(args[1]);
         state.setFileName(args[1]);
         state.setAutoSave(true);
         state.setProperty("finalizedCrawls.startTimestamp", System.currentTimeMillis());
@@ -53,8 +55,9 @@ public class App {
             try {
                 Person person = new Person();
                 person.setPersonId(personId);
-                pp.getPersonVotes(person, subjectMatters);
                 pp.getPersonProfile(person);
+                pp.getPersonVotes(person, subjectMatters);
+
                 //List<Map<String, Object>> map = pp.getPerson(person, );
                 //object.put("voteData", map);
                 StatsProcessor stats=new StatsProcessor(person);
@@ -67,6 +70,11 @@ public class App {
                 person.setStatsLast30Days(last30Stats);
                 person.setStatsLast90Days(last90Stats);
                 person.setStatsLast365Days(last365Stats);
+
+                SortedMap<Long, Vote> tempVote=person.getVoteMap();
+                person.setVoteMap(null);
+                jser.serialize(configuration.getString("output.profileStats.path"), personId, person);
+                person.setVoteMap(tempVote);
                 jser.serialize(configuration.getString("output.profile.path"), personId, person);
                 jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
                 state.setProperty("partialCrawls.lastProfile", personId);

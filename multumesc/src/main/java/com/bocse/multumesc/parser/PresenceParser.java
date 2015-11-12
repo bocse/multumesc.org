@@ -42,7 +42,7 @@ public class PresenceParser {
     private final static Double backoffExponent=1.9;
 
     private final static Logger logger = Logger.getLogger(App.class.toString());
-    private final static String pattern = "dd.mm.yyyy HH:mm";
+    private final static String pattern = "dd.MM.yyyy HH:mm";
     private final static DateTimeFormatter dateTimeFormat=DateTimeFormat.forPattern(pattern);
     //private HashMap<Long, SubjectMatter> subjectMatters;
 
@@ -236,7 +236,20 @@ public class PresenceParser {
         logger.info(elements.first().text());
         logger.getName();
         person.setName(name);
-        elements=doc.select("body > table > tbody > tr > td:nth-child(2) > table:nth-child(2) > tbody > tr > td:nth-child(3) > p:nth-child(3) > table > tbody > tr > td > p:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(2) > table > tbody > tr > td:nth-child(2) > table > tbody > tr > td:nth-child(1)");
+        ///html/body/table:eq(1)/tbody/tr/td:eq(2)/p:eq(3)/table/tbody/tr/td/p:eq(2)/table/tbody/tr:eq(2)/td:eq(2)/table
+        elements=doc.select("table:eq(3) > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr");//> tr > td:eq(2) > p:eq(3) > table  > tr > td > p:eq(2) > table > tr:eq(2) > td:eq(2) > table");
+
+        for (int elementIndex=0; elementIndex<elements.size(); elementIndex++)
+        {
+            String partyString=elements.get(elementIndex).text();
+            String[] partyParts=partyString.split(" - ");
+            person.setCurrentParty(partyParts[0].trim().toUpperCase());
+            person.getPreviousPartyList().add(partyParts[0].trim().toUpperCase());
+            logger.info(partyString);
+        }
+        //12
+        //Formaţiunea politică:
+        logger.info(""+elements.size());
         return foundElements;
     }
 
