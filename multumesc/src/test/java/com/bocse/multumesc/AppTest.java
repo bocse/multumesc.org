@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.joda.time.DateTime;
 
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.TreeMap;
 
@@ -74,5 +75,21 @@ public class AppTest
             String[] split = sarray[i].split("\\s*\\t*" + "-" + "\\s*\\t*\\n*");
             System.out.println(Arrays.toString(split));
         }
+    }
+
+    public static String flattenToAscii(String string) {
+        StringBuilder sb = new StringBuilder(string.length());
+        string = Normalizer.normalize(string, Normalizer.Form.NFD);
+        for (char c : string.toCharArray()) {
+            if (c <= '\u007F') sb.append(c);
+        }
+        return sb.toString();
+    }
+    public void testString()
+    {
+        String string=" până ăîĂÎșțȘȚâÂ";
+        //string = Normalizer.normalize(string, Normalizer.Form.NFKD);
+
+        System.out.println(flattenToAscii(string));
     }
 }

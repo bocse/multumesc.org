@@ -1,8 +1,10 @@
 package com.bocse.multumesc.parser;
 
 import com.bocse.multumesc.App;
+import com.bocse.multumesc.data.Counties;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
+import com.bocse.multumesc.utils.TextUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -231,6 +233,7 @@ public class PresenceParser {
     {
         Long foundElements=0L;
         Long parsingErrors=0L;
+        Counties counties=new Counties();
         Elements elements=doc.select(".headline");
         String name=elements.first().text();
         name=name.substring(0, name.indexOf("Sinteza")).trim();
@@ -254,7 +257,62 @@ public class PresenceParser {
             person.getAllPartyList().add(partyInitials);
             logger.info(partyString);
         }
+        ///td[2]/table[2]/tbody/tr/td[3]/p[2]/table/tbody/tr/td/p[1]/table/tbody/tr[2]/td[2]
+        elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1)");
+        //ales deputat în circumscripţia electorală nr.22 HUNEDOARA, colegiul uninominal nr.3 data încetarii mandatului: 29 aprilie 2013 - înlocuit de: Petru-Sorin Marica
+        String presentationText=elements.get(0).text().toLowerCase();
+        String presentationTextFlattened= TextUtils.flattenToAscii(presentationText);
+        person.setDescription(presentationText);
+        //String personCounty=null;
+        /*
+        for (String county:counties.getCounties()) {
+            if (presentationTextFlattened.contains(TextUtils.flattenToAscii(county))) {
+                personCounty = county;
+                break;
+            }
+        }
+        */
 
+        if ( presentationTextFlattened.contains("ales la nivel national") || presentationTextFlattened.contains("aleasa la nivel national"))
+        {
+            person.setCounty("NATIONAL");
+            person.setCircumscription(-1L);
+            person.setColegiu(-1L);
+        }
+        else {
+            {
+                String markerString = "circumscripţia electorală nr.";
+                int index1 = presentationText.indexOf(markerString, 0) + markerString.length();
+                int index2 = presentationText.indexOf(",", index1);
+                String countyString = presentationText.substring(index1, index2);
+                person.setCounty(TextUtils.flattenToAscii(countyString.split(" ")[1]));;
+            }
+
+            {
+                String markerString = "circumscripţia electorală nr.";
+                int index1 = presentationText.indexOf(markerString, 0) + markerString.length();
+                int index2 = presentationText.indexOf(" ", index1);
+                String circumscriptionString = presentationText.substring(index1, index2);
+                person.setCircumscription(Long.valueOf(circumscriptionString));
+            }
+            {
+                String markerString = "colegiul uninominal nr.";
+                int index1 = presentationText.indexOf(markerString, 0) + markerString.length();
+                int index2 = presentationText.indexOf(" ", index1);
+                if (index2 == -1)
+                    index2 = presentationText.length();
+                String colegiuString = presentationText.substring(index1, index2);
+                person.setColegiu(Long.valueOf(colegiuString));
+            }
+        }
+        if (presentationText.contains("deces") || presentationText.contains("data încetarii mandatului") || presentationText.contains("demis") || presentationText.contains("demisie") )
+        {
+            person.setActive(false);
+        }
+        else
+        {
+            person.setActive(true);
+        }
         logger.info(""+elements.size());
         return foundElements;
     }

@@ -48,7 +48,7 @@ public class AppTestRun {
         if (configuration.getBoolean("working.mode.resumeLastCrawl"))
             firstPerson = Math.max(firstPerson, 1 + state.getLong("partialCrawls.lastProfile", 1L));
         Long maxPerson = configuration.getLong("assumptions.lastPerson", 418);
-        Long personId = 74L;
+        Long personId = 7L;
         Person person = new Person();
         person.setPersonId(personId);
 

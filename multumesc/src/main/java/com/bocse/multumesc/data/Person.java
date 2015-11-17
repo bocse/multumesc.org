@@ -14,6 +14,11 @@ public class Person  {
     private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
     private Long lastUpdateTimestamp=0L;
+    private String description;
+    private String county;
+    private Long colegiu;
+    private Boolean active;
+    private Long circumscription;
     private Map<VoteTypes, AtomicLong> statsLast30Days=new ConcurrentHashMap<>();
     private Map<VoteTypes, AtomicLong> statsLast90Days=new ConcurrentHashMap<>();
     private Map<VoteTypes, AtomicLong> statsLast365Days=new ConcurrentHashMap<>();
@@ -99,5 +104,45 @@ public class Person  {
 
     public void setLastUpdateTimestamp(Long lastUpdateTimestamp) {
         this.lastUpdateTimestamp = lastUpdateTimestamp;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public Long getColegiu() {
+        return colegiu;
+    }
+
+    public void setColegiu(Long colegiu) {
+        this.colegiu = colegiu;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public Long getCircumscription() {
+        return circumscription;
+    }
+
+    public void setCircumscription(Long circumscription) {
+        this.circumscription = circumscription;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

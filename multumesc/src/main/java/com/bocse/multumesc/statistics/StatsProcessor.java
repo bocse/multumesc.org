@@ -69,7 +69,8 @@ public class StatsProcessor {
 
         for(Person person : persons)
         {
-
+            if (!person.getActive())
+                continue;
             Map<VoteTypes, AtomicLong> chosenMap;
             switch (period)
             {
@@ -123,7 +124,8 @@ public class StatsProcessor {
         for(Person person : persons)
         {
 
-
+            if (!person.getActive())
+                continue;
             String party=person.getCurrentParty();
             Map<VoteTypes, AtomicLong> partyVotes;
             if (!votesByParty.containsKey(party)) {

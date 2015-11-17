@@ -79,23 +79,30 @@ public class App {
                 jser.serialize(configuration.getString("output.profile.path"), personId, person);
                 jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
 
+                if (person.getActive()) {
+                    //Compute party - version 1
+                    List<Person> personWrapper = new ArrayList<>();
+                    personWrapper.add(person);
+                    Map<Integer, Map<String, Map<VoteTypes, AtomicLong>>> partyResults = new HashMap<>();
+                    partyResults.put(30, stats.processPartyFromPerson(partyVotes, personWrapper, 30));
+                    partyResults.put(90, stats.processPartyFromPerson(partyVotes, personWrapper, 90));
+                    partyResults.put(365, stats.processPartyFromPerson(partyVotes, personWrapper, 365));
+                    partyResults.put(-1, stats.processPartyFromPerson(partyVotes, personWrapper, -1));
+                    jser.serialize(configuration.getString("output.partyStats.path"), 1L, partyResults);
 
-                //Compute party - version 1
-                List<Person> personWrapper=new ArrayList<>();
-                personWrapper.add(person);
-                Map<Integer, Map<String, Map<VoteTypes, AtomicLong>>> partyResults=new HashMap<>();
-                partyResults.put(30,stats.processPartyFromPerson(partyVotes, personWrapper, 30));
-                partyResults.put(90, stats.processPartyFromPerson(partyVotes, personWrapper, 90));
-                partyResults.put(365, stats.processPartyFromPerson(partyVotes, personWrapper, 365));
-                partyResults.put(-1,stats.processPartyFromPerson(partyVotes, personWrapper, -1));
-                jser.serialize(configuration.getString("output.partyStats.path"), 1L, partyResults);
+                    //Compute party - version 1
+                    partyResults = new HashMap<>();
+                    partyResults.put(30, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(30), new DateTime()));
+                    partyResults.put(90, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(90), new DateTime()));
+                    partyResults.put(365, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(365), new DateTime()));
+                    partyResults.put(-1, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(9999), new DateTime()));
+                    jser.serialize(configuration.getString("output.partyStats.path"), 2L, partyResults);
+                }
+                else
+                {
+                    logger.info("Person "+person.getPersonId()+ " is not active, so it will not be added to party "+person.getCurrentParty()+" stats.");
+                }
 
-                partyResults=new HashMap<>();
-                partyResults.put(30, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(30), new DateTime() ));
-                partyResults.put(90, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(90), new DateTime() ));
-                partyResults.put(365, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(365), new DateTime() ));
-                partyResults.put(-1, stats.processPartyFromVotes(partyVotes2, personWrapper,new DateTime().minusDays(9999), new DateTime() ));
-                jser.serialize(configuration.getString("output.partyStats.path"), 2L, partyResults);
                 state.setProperty("partialCrawls.lastProfile", personId);
                 Thread.sleep((int) (1 + System.nanoTime() % 1000));
             } finally {

@@ -1,106 +1,136 @@
 package com.bocse.multumesc.data;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.bocse.multumesc.utils.TextUtils;
+
+import java.text.Normalizer;
+import java.util.*;
 
 /**
  * Created by bocse on 16.11.2015.
  */
 public class Counties {
-    Set<String> counties = new HashSet<>();
 
-    private void add(String name) {
-        counties.add(name.trim().toLowerCase());
+    private final Map<String, Long> counties = new HashMap<>();
+    private final Map<String, Long> countiesFlattened=new HashMap<>();
+
+    public Counties()
+    {
+        init();
+        for (Map.Entry<String, Long> entry: counties.entrySet())
+        {
+            countiesFlattened.put(TextUtils.flattenToAscii(entry.getKey()), entry.getValue());
+        }
+    }
+    public Long getCircumscription(String county)
+    {
+        Long circumscription=null;
+        circumscription=counties.get(county);
+        if (circumscription==null)
+            circumscription=countiesFlattened.get(county);
+        return circumscription;
+    }
+    public List<String> getCounties(){
+        return new ArrayList<String>(counties.keySet());
+    }
+
+
+    private void add(String name, Long circumscription) {
+        counties.put(name.trim().toLowerCase(), circumscription);
+    }
+
+    public boolean contains(String county)
+    {
+        return countiesFlattened.containsKey(county) || counties.containsKey(county);
     }
 
     private void init() {
 
 
-        add("ALBA");
+        add("ALBA", 1L);
 
-        add("ARAD");
+        add("ARAD", 2L);
 
-        add("ARGEŞ");
+        add("ARGEŞ", 3L);
 
-        add("BACĂU");
+        add("BACĂU", 4L);
 
-        add("BIHOR");
+        add("BIHOR", 5L);
 
-        add("BISTRIŢA-NĂSĂUD");
+        add("BISTRIŢA-NĂSĂUD", 6L);
 
-        add("BOTOŞANI");
+        add("BOTOŞANI", 7L);
 
-        add("BRAŞOV");
+        add("BRAŞOV", 8L);
 
-        add("BRĂILA");
+        add("BRĂILA", 9L);
 
-        add("BUZĂU");
+        add("BUZĂU", 10L);
 
-        add("CARAŞ-SEVERIN");
+        add("CARAŞ-SEVERIN", 11L);
 
-        add("CĂLĂRAŞI");
+        add("CĂLĂRAŞI", 12L);
 
-        add("CLUJ");
+        add("CLUJ", 13L);
 
-        add("CONSTANŢA");
+        add("CONSTANŢA", 14L);
 
-        add("COVASNA");
+        add("COVASNA", 15L);
 
-        add("DÂMBOVIŢA");
+        add("DÂMBOVIŢA", 16L);
 
-        add("DOLJ");
+        add("DOLJ", 17L);
 
-        add("GALAŢI");
+        add("GALAŢI", 18L);
 
-        add("GIURGIU");
+        add("GIURGIU", 19L);
 
-        add("GORJ");
+        add("GORJ", 20L);
 
-        add("HARGHITA");
+        add("HARGHITA", 21L);
 
-        add("HUNEDOARA");
+        add("HUNEDOARA", 22L);
 
-        add("IALOMIŢA");
+        add("IALOMIŢA", 23L);
 
-        add("IAŞI");
+        add("IAŞI", 24L);
 
-        add("ILFOV");
+        add("ILFOV", 25L);
 
-        add("MARAMUREŞ");
+        add("MARAMUREŞ", 26L);
 
-        add("MEHEDINŢI");
+        add("MEHEDINŢI", 27L);
 
-        add("MUREŞ");
+        add("MUREŞ", 28L);
 
-        add("NEAMŢ");
+        add("NEAMŢ", 29L);
 
-        add("OLT");
+        add("OLT", 30L);
 
-        add("PRAHOVA");
+        add("PRAHOVA", 31L);
 
-        add("SATU MARE");
+        add("SATU-MARE", 32L);
 
-        add("SĂLAJ");
+        add("SĂLAJ", 33L);
 
-        add("SIBIU");
+        add("SIBIU", 34L);
 
-        add("SUCEAVA");
+        add("SUCEAVA", 35L);
 
-        add("TELEORMAN");
+        add("TELEORMAN", 36L);
 
-        add("TIMIŞ");
+        add("TIMIŞ", 37L);
 
-        add("TULCEA");
+        add("TULCEA", 38L);
 
-        add("VASLUI");
+        add("VASLUI", 39L);
 
-        add("VÂLCEA");
+        add("VÂLCEA", 40L);
 
-        add("VRANCEA");
+        add("VRANCEA", 41L);
 
-        add("BUCUREȘTI");
+        add("BUCUREȘTI", 42L);
 
-        add("STRĂINĂTATE");
+        add("DIASPORA", 43L);
 
 
     }
