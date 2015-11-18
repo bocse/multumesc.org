@@ -110,7 +110,7 @@ public class MultumescMain {
             }
 
         }
-        jser.serialize(configuration.getString("output.profileTogether.path"), 0L, persons);
+        // jser.serialize(configuration.getString("output.profileTogether.path"), 0L, persons);
         for (Person p:persons.values())
         {
             p.setVoteMap(null);

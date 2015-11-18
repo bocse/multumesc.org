@@ -1,9 +1,7 @@
 package com.bocse.multumesc.parser;
 
 import com.bocse.multumesc.MultumescMain;
-import com.bocse.multumesc.data.Counties;
-import com.bocse.multumesc.data.Person;
-import com.bocse.multumesc.data.Vote;
+import com.bocse.multumesc.data.*;
 import com.bocse.multumesc.utils.TextUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,9 +27,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -51,6 +47,18 @@ public class PresenceParser {
 
     public Document getProfileDocument(final Long personId) throws IOException, InterruptedException {
         return getDocument(createProfileRequestDocument(personId));
+    }
+
+    private HttpUriRequest createCircumscriptionRequestDocument(final String county, final Long colegiu, final String prefix)
+    {
+        final String url ="http://www.becparlamentare2012.ro/"+prefix+colegiu.toString()+"-"+county+".html";
+        final HttpGet httpGet = new HttpGet(url);
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(9000).setConnectTimeout(9000).setSocketTimeout(9000).build();
+        httpGet.setConfig(requestConfig);
+        logger.info("Executing request " + httpGet.getRequestLine() + " county " + county + " colegiu " + colegiu  );
+        return httpGet;
+
     }
 
     private HttpUriRequest createProfileRequestDocument(final Long personId)
@@ -95,8 +103,15 @@ public class PresenceParser {
     public Document getVoteDocument(final Long personId, final Long eventId) throws IOException, InterruptedException {
         return getDocument(createVoteRequestDocument(personId, eventId));
     }
+    public Document getCircumscriptionDocument(final String county, final Long colegiu, final String prefix) throws IOException, InterruptedException {
+        return getDocument(createCircumscriptionRequestDocument(county, colegiu, prefix),false);
+    }
 
-    public Document getDocument(HttpUriRequest httpRequest) throws IOException, InterruptedException {
+    private Document getDocument(HttpUriRequest httpRequest) throws IOException, InterruptedException {
+        return getDocument(httpRequest, true);
+    }
+
+    private Document getDocument(HttpUriRequest httpRequest, final Boolean throwOnEmptyDocument) throws IOException, InterruptedException {
         Document doc=null;
         Long delay = initialDelay;
         Long attemptIndex = 0L;
@@ -151,7 +166,10 @@ public class PresenceParser {
                                 //return entity != null ? EntityUtils.toString(entity) : null;
                                 return doc;
                             } else {
+                                if (throwOnEmptyDocument)
                                 throw new ClientProtocolException("Unexpected response status: " + status);
+                                else
+                                    return null;
                             }
                         }
 
@@ -228,7 +246,91 @@ public class PresenceParser {
         return foundElements;
     }
 
+    public List<Location> parseCircumscriptionDocument(Document doc, String county, Long circumscription, Long colegiu) {
+        List<Location> locations = new ArrayList<>();
+        if (doc == null)
+            return locations;
+        Elements elements = doc.select("body > div > div > table > tbody > tr:eq(4) > td > p");
+        for (int elementIndex=1; elementIndex<elements.size(); elementIndex++){
+            Element element=elements.get(elementIndex);
+            String text = TextUtils.flattenToAscii(element.text()).toLowerCase();
 
+            String[] parts = text.split(":");
+            if (parts.length > 1) {
+                if (parts[0].contains("sat")) {
+
+                    String[] sate = parts[1].split(",");
+                    for (String sat : sate) {
+                        Location location = new Location();
+                        location.setCounty(county);
+                        location.setCircumscription(circumscription);
+                        location.setColegiu(colegiu);
+                        location.setName(sat);
+                        location.setLocationType(LocationType.SAT);
+                    }
+                } else if (parts[0].contains("localitate componenta") || parts[0].contains("localitati componente")) {
+
+                    String[] comune = parts[1].split(",");
+                    for (String comuna : comune) {
+                        Location location = new Location();
+                        location.setCounty(county);
+                        location.setCircumscription(circumscription);
+                        location.setColegiu(colegiu);
+                        location.setName(comuna);
+                        location.setLocationType(LocationType.COMUNA);
+                        locations.add(location);
+                    }
+                } else {
+                    Location location = new Location();
+                    location.setCounty(county);
+                    location.setCircumscription(circumscription);
+                    location.setColegiu(colegiu);
+                    location.setName(text);
+                    location.setLocationType(LocationType.NA);
+                    locations.add(location);
+                    logger.warning("Unknown location type" + text);
+                }
+            } else {
+                if (parts[0].contains("comuna ")) {
+                    Location location = new Location();
+                    location.setCounty(county);
+                    location.setCircumscription(circumscription);
+                    location.setColegiu(colegiu);
+                    location.setName(parts[0].replace("comuna ", ""));
+                    location.setLocationType(LocationType.COMUNA);
+                    locations.add(location);
+
+                }
+                else
+                if (parts[0].contains("municipiul ")) {
+                    Location location = new Location();
+                    location.setCounty(county);
+                    location.setCircumscription(circumscription);
+                    location.setColegiu(colegiu);
+                    location.setName(parts[0].replace("municipiul ", ""));
+                    location.setLocationType(LocationType.MUNICIPIU);
+                    locations.add(location);
+                }
+                else {
+                    if (parts[0]!=null && !parts[0].isEmpty()) {
+                        Location location = new Location();
+                        location.setCounty(county);
+                        location.setCircumscription(circumscription);
+                        location.setColegiu(colegiu);
+                        location.setName(parts[0]);
+                        if (county.equals("STRAINATATE"))
+                            location.setLocationType(LocationType.TARA);
+                        else
+                        location.setLocationType(LocationType.STRADA);
+                        locations.add(location);
+                    }
+                }
+            }
+
+
+        }
+        return locations;
+    }
     public Long parserProfileDocument(Person person, Document doc)
     {
         Long foundElements=0L;
@@ -237,8 +339,8 @@ public class PresenceParser {
         Elements elements=doc.select(".headline");
         String name=elements.first().text();
         name=name.substring(0, name.indexOf("Sinteza")).trim();
-        logger.info(elements.first().text());
-        logger.getName();
+        //logger.info(elements.first().text());
+        //logger.getName();
         person.setName(name);
         ///html/body/table:eq(1)/tbody/tr/td:eq(2)/p:eq(3)/table/tbody/tr/td/p:eq(2)/table/tbody/tr:eq(2)/td:eq(2)/table
         elements=doc.select("table:eq(3) > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr");//> tr > td:eq(2) > p:eq(3) > table  > tr > td > p:eq(2) > table > tr:eq(2) > td:eq(2) > table");
@@ -255,9 +357,13 @@ public class PresenceParser {
 
             person.setCurrentParty(partyInitials);
             person.getAllPartyList().add(partyInitials);
-            logger.info(partyString);
+            //logger.info(partyString);
         }
         ///td[2]/table[2]/tbody/tr/td[3]/p[2]/table/tbody/tr/td/p[1]/table/tbody/tr[2]/td[2]
+        elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1) > table > tbody ");
+
+        person.setContactInformation(elements.get(elements.size()-1).text());
+
         elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1)");
         //ales deputat în circumscripţia electorală nr.22 HUNEDOARA, colegiul uninominal nr.3 data încetarii mandatului: 29 aprilie 2013 - înlocuit de: Petru-Sorin Marica
         String presentationText=elements.get(0).text().toLowerCase();
@@ -336,4 +442,45 @@ public class PresenceParser {
         person.setLastUpdateTimestamp(System.currentTimeMillis());
     }
 
+    public List<Location> getAllCircumscriptions() throws IOException, InterruptedException {
+        Counties counties=new Counties();
+
+        List<String> countiesFlattened=counties.getCountiesFlattened();
+        countiesFlattened.add("STRAINATATE");
+        return getAllCircumscriptions(countiesFlattened);
+
+    }
+    public List<Location> getAllCircumscriptions(List<String> countiesFlattened) throws IOException, InterruptedException {
+        Counties counties=new Counties();
+        List<Location> locations=new ArrayList<>();
+        Set<String> countiesReceived=new HashSet<String>();
+        Set<String> emptyCounty=new HashSet<String>();
+        for (String county : countiesFlattened) {
+            Long circumscription = counties.getCircumscription(county);
+            boolean somethingSet=false;
+            for (long colegiu = 1L; colegiu < 50; colegiu++) {
+                List<Location> partialLocations = new ArrayList<>();
+                partialLocations.addAll(parseCircumscriptionDocument(getCircumscriptionDocument(county.toUpperCase().replace("-","%20"), colegiu, "CD"), county, circumscription, colegiu));
+                partialLocations.addAll(parseCircumscriptionDocument(getCircumscriptionDocument(county.toUpperCase().replace("-","%20"), colegiu, "C"), county, circumscription, colegiu));
+                if (partialLocations.size() == 0) {
+
+                    break;
+                }
+                else {
+                    countiesReceived.add(county);
+                    somethingSet=true;
+                    locations.addAll(partialLocations);
+                }
+            }
+            if (!somethingSet)
+            {
+                emptyCounty.add(county);
+            }
+        }
+        logger.info("Received size " + countiesReceived.size());
+        logger.info("Empty size "+emptyCounty.size());
+        logger.info("Received " + Arrays.toString(countiesReceived.toArray()));
+        logger.info("Empty " + Arrays.toString(emptyCounty.toArray()));
+        return locations;
+    }
 }

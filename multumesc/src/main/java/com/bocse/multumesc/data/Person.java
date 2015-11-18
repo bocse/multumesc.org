@@ -15,6 +15,7 @@ public class Person  {
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
     private Long lastUpdateTimestamp=0L;
     private String description;
+    private String contactInformation;
     private String county;
     private Long colegiu;
     private Boolean active;
@@ -144,5 +145,13 @@ public class Person  {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getContactInformation() {
+        return contactInformation;
+    }
+
+    public void setContactInformation(String contactInformation) {
+        this.contactInformation = contactInformation;
     }
 }

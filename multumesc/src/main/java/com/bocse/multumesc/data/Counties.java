@@ -29,8 +29,13 @@ public class Counties {
             circumscription=countiesFlattened.get(county);
         return circumscription;
     }
+
     public List<String> getCounties(){
         return new ArrayList<String>(counties.keySet());
+    }
+
+    public List<String> getCountiesFlattened() {
+        return new ArrayList<String>(countiesFlattened.keySet());
     }
 
 
