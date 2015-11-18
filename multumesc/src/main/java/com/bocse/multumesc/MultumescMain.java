@@ -7,14 +7,12 @@ import com.bocse.multumesc.data.VoteTypes;
 import com.bocse.multumesc.parser.PresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
 import com.bocse.multumesc.statistics.StatsProcessor;
-import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.joda.time.DateTime;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,13 +22,13 @@ import java.util.logging.Logger;
 /**
  * Multumesc Main app.
  */
-public class App {
-    final static Logger logger = Logger.getLogger(App.class.toString());
+public class MultumescMain {
+    final static Logger logger = Logger.getLogger(MultumescMain.class.toString());
     public final static FileConfiguration configuration = new PropertiesConfiguration();
     public final static FileConfiguration state=new PropertiesConfiguration();
     public final static Map<String, Map<VoteTypes, AtomicLong>> partyVotes=new ConcurrentHashMap<>();
     public final static Map<String, Map<VoteTypes, AtomicLong>> partyVotes2=new ConcurrentHashMap<>();
-
+    public final static Map<String, Person> persons=new ConcurrentHashMap<String, Person>();
     public static void main(String[] args) throws IOException, InterruptedException, ConfigurationException {
         if (new File(args[1]).exists())
             state.load(args[1]);
@@ -75,10 +73,12 @@ public class App {
                 SortedMap<Long, Vote> tempVote=person.getVoteMap();
                 person.setVoteMap(null);
                 jser.serialize(configuration.getString("output.profileStats.path"), personId, person);
+
                 person.setVoteMap(tempVote);
                 jser.serialize(configuration.getString("output.profile.path"), personId, person);
-                jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
-
+                if (personId % 10==1 || personId==maxPerson)
+                    jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
+                persons.put(person.getName(), person);
                 if (person.getActive()) {
                     //Compute party - version 1
                     List<Person> personWrapper = new ArrayList<>();
@@ -110,7 +110,12 @@ public class App {
             }
 
         }
-
+        jser.serialize(configuration.getString("output.profileTogether.path"), 0L, persons);
+        for (Person p:persons.values())
+        {
+            p.setVoteMap(null);
+        }
+        jser.serialize(configuration.getString("output.profileStatsTogether.path"), 0L, persons);
         state.setProperty("finalizedCrawls.lastTimestamp", System.currentTimeMillis());
         state.setProperty("partialCrawls.lastProfile", 0L);
     }

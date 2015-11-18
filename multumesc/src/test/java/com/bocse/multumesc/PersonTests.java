@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple MultumescMain.
  */
 public class PersonTests
     extends TestCase

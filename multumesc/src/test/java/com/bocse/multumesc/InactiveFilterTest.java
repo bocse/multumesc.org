@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple MultumescMain.
  */
 public class InactiveFilterTest
     extends TestCase
@@ -63,7 +63,7 @@ public class InactiveFilterTest
 
         }
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-        System.out.println( gson.toJson(inactivePerson));
+        System.out.println(gson.toJson(inactivePerson));
         System.out.print(gson.toJson(inactiveList));
     }
 }

@@ -1,6 +1,6 @@
 package com.bocse.multumesc.parser;
 
-import com.bocse.multumesc.App;
+import com.bocse.multumesc.MultumescMain;
 import com.bocse.multumesc.data.Counties;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
@@ -44,7 +44,7 @@ public class PresenceParser {
     private final static Long initialDelay=1300L;
     private final static Double backoffExponent=1.9;
 
-    private final static Logger logger = Logger.getLogger(App.class.toString());
+    private final static Logger logger = Logger.getLogger(MultumescMain.class.toString());
     private final static String pattern = "dd.MM.yyyy HH:mm";
     private final static DateTimeFormatter dateTimeFormat=DateTimeFormat.forPattern(pattern);
     //private HashMap<Long, SubjectMatter> subjectMatters;
