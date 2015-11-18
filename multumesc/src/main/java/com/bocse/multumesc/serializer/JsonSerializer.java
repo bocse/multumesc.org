@@ -21,7 +21,7 @@ public class JsonSerializer {
         }
 
         FileOutputStream fos=new FileOutputStream(file);
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jsonString=gson.toJson(object);
 
         byte[] latin2JsonString =  jsonString.getBytes("UTF-8");
