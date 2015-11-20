@@ -18,10 +18,12 @@ public class SenatorPresenceParser {
     final WebClient webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_11);
     public SenatorPresenceParser()
     {
+        java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.SEVERE);
         //webClient.setJavaScriptEngine(JavaScriptEngine.);
          webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
+
     }
 
     public void initParser(String url) throws IOException {
@@ -32,6 +34,7 @@ public class SenatorPresenceParser {
 
                 public WebResponse getResponse(WebRequest request) throws IOException {
                     WebResponse response = super.getResponse(request);
+                    logger.info("Request: "+request.getUrl());
                     if (request.getHttpMethod().name().equals("POST"))
                     {
                         logger.info("POST DETECTED");
@@ -43,6 +46,7 @@ public class SenatorPresenceParser {
                     return response;
                 }
             };
+
             final HtmlPage page = webClient.getPage(url);
 
             logger.info(page.getTitleText());
