@@ -33,14 +33,14 @@ import java.util.logging.Logger;
 /**
  * Created by bocse on 10.11.2015.
  */
-public class PresenceParser {
+public class DeputyPresenceParser {
 
 
     private final static Long maxAttempts=10L;
     private final static Long initialDelay=1300L;
     private final static Double backoffExponent=1.9;
 
-    private final static Logger logger = Logger.getLogger(MultumescMain.class.toString());
+    private final static Logger logger = Logger.getLogger(DeputyPresenceParser.class.toString());
     private final static String pattern = "dd.MM.yyyy HH:mm";
     private final static DateTimeFormatter dateTimeFormat=DateTimeFormat.forPattern(pattern);
     //private HashMap<Long, SubjectMatter> subjectMatters;

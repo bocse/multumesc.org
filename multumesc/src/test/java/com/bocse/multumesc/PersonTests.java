@@ -2,21 +2,15 @@ package com.bocse.multumesc;
 
 import com.bocse.multumesc.data.Counties;
 import com.bocse.multumesc.data.Person;
-import com.bocse.multumesc.data.Vote;
-import com.bocse.multumesc.data.VoteTypes;
-import com.bocse.multumesc.parser.PresenceParser;
+import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.TreeMap;
 
 /**
  * Unit test for simple MultumescMain.
@@ -49,7 +43,7 @@ public class PersonTests
 
         for (Long personId=1L; personId<=417L; personId++) {
 
-            PresenceParser pp = new PresenceParser();
+            DeputyPresenceParser pp = new DeputyPresenceParser();
             Counties counties=new Counties();
 
             Person person = new Person();

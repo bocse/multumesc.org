@@ -2,17 +2,14 @@ package com.bocse.multumesc;
 
 
 import com.bocse.multumesc.data.Person;
-import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
-import com.bocse.multumesc.parser.PresenceParser;
+import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
-import com.bocse.multumesc.statistics.StatsProcessor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.joda.time.DateTime;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,7 +40,7 @@ public class AppTestRun {
 
         JsonSerializer jser = new JsonSerializer();
 
-        PresenceParser pp = new PresenceParser();
+        DeputyPresenceParser pp = new DeputyPresenceParser();
         Long firstPerson = configuration.getLong("assumptions.firstPerson", 1);
         if (configuration.getBoolean("working.mode.resumeLastCrawl"))
             firstPerson = Math.max(firstPerson, 1 + state.getLong("partialCrawls.lastProfile", 1L));

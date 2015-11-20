@@ -2,10 +2,9 @@ package com.bocse.multumesc;
 
 import com.bocse.multumesc.data.Counties;
 import com.bocse.multumesc.data.Person;
-import com.bocse.multumesc.parser.PresenceParser;
+import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -46,7 +45,7 @@ public class InactiveFilterTest
         List<Person> inactivePerson=new ArrayList<>();
         for (Long personId=1L; personId<=417L; personId++) {
 
-            PresenceParser pp = new PresenceParser();
+            DeputyPresenceParser pp = new DeputyPresenceParser();
             Counties counties=new Counties();
 
             Person person = new Person();

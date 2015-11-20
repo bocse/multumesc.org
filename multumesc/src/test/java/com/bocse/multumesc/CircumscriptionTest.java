@@ -1,24 +1,15 @@
 package com.bocse.multumesc;
 
 import com.bocse.multumesc.data.Location;
-import com.bocse.multumesc.data.Person;
-import com.bocse.multumesc.data.Vote;
-import com.bocse.multumesc.data.VoteTypes;
-import com.bocse.multumesc.parser.PresenceParser;
+import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.joda.time.DateTime;
 
 import java.io.IOException;
-import java.text.Normalizer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * Unit test for simple MultumescMain.
@@ -48,7 +39,7 @@ public class CircumscriptionTest
      * Rigourous Test :-)
      */
     public void testCircumscriptio() throws IOException, InterruptedException {
-        PresenceParser pp=new PresenceParser();
+        DeputyPresenceParser pp=new DeputyPresenceParser();
         List<String> counties=new ArrayList<>();
         //counties.add("CARAS-SEVERIN");
         //counties.add("BISTRITA-NASAUD");

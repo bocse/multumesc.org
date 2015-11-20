@@ -4,7 +4,7 @@ package com.bocse.multumesc;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
-import com.bocse.multumesc.parser.PresenceParser;
+import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
 import com.bocse.multumesc.statistics.StatsProcessor;
 import org.apache.commons.configuration.ConfigurationException;
@@ -42,7 +42,7 @@ public class MultumescMain {
 
         JsonSerializer jser = new JsonSerializer();
 
-        PresenceParser pp = new PresenceParser();
+        DeputyPresenceParser pp = new DeputyPresenceParser();
         Long firstPerson = configuration.getLong("assumptions.firstPerson", 1);
         if (configuration.getBoolean("working.mode.resumeLastCrawl"))
             firstPerson=Math.max(firstPerson, 1+state.getLong("partialCrawls.lastProfile", 1L));
