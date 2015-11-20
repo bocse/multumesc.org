@@ -36,7 +36,8 @@ public class SenatorTest
      */
     public void testSenator() throws IOException, InterruptedException {
         SenatorPresenceParser spp=new SenatorPresenceParser();
-        spp.initParser("http://senat.ro/FisaSenator.aspx?ParlamentarID=9d0635d5-1743-4696-8acd-e97e070da503");
+        spp.init();
+        spp.initProfilePage("http://senat.ro/FisaSenator.aspx?ParlamentarID=9d0635d5-1743-4696-8acd-e97e070da503");
 
     }
 
