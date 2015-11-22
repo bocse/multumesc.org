@@ -3,7 +3,6 @@ package com.bocse.multumesc;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
-import com.bocse.multumesc.parser.ParsingConstants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import junit.framework.Test;
@@ -52,7 +51,7 @@ public class AppTest
 
         Person person=new Person();
         person.setPersonId(13L);
-        person.setName("Gigi Voicu");
+        person.setFullName("Gigi Voicu");
         person.setVoteMap(new TreeMap<Long, Vote>());
         person.getVoteMap().put(10L, vote);
         Gson gson = new GsonBuilder().create();

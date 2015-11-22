@@ -78,7 +78,7 @@ public class MultumescMain {
                 jser.serialize(configuration.getString("output.profile.path"), personId, person);
                 if (personId % 10==1 || personId==maxPerson)
                     jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
-                persons.put(person.getName(), person);
+                persons.put(person.getFullName(), person);
                 if (person.getActive()) {
                     //Compute party - version 1
                     List<Person> personWrapper = new ArrayList<>();

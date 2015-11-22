@@ -1,7 +1,7 @@
 package com.bocse.multumesc.parser;
 
-import com.bocse.multumesc.MultumescMain;
 import com.bocse.multumesc.data.*;
+import com.bocse.multumesc.utils.NameUtils;
 import com.bocse.multumesc.utils.TextUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -340,9 +340,17 @@ public class DeputyPresenceParser {
         String name=elements.first().text();
         name=name.substring(0, name.indexOf("Sinteza")).trim();
         //logger.info(elements.first().text());
-        //logger.getName();
-        person.setName(name);
-        ///html/body/table:eq(1)/tbody/tr/td:eq(2)/p:eq(3)/table/tbody/tr/td/p:eq(2)/table/tbody/tr:eq(2)/td:eq(2)/table
+        //logger.getFullName();
+        person.setFullName(name);
+        person.setFirstName(NameUtils.getFirstNames(name));
+        person.setLastName(NameUtils.getLastName(name));
+
+        elements=doc.select("#itm974 > td > a ");
+        if (elements.size()>=1)
+            person.setPictureURL("http://www.cdep.ro"+elements.get(0).attr("href"));
+        else
+            person.setPictureURL("");
+
         elements=doc.select("table:eq(3) > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr");//> tr > td:eq(2) > p:eq(3) > table  > tr > td > p:eq(2) > table > tr:eq(2) > td:eq(2) > table");
 
         for (int elementIndex=0; elementIndex<elements.size(); elementIndex++)
@@ -357,9 +365,8 @@ public class DeputyPresenceParser {
 
             person.setCurrentParty(partyInitials);
             person.getAllPartyList().add(partyInitials);
-            //logger.info(partyString);
         }
-        ///td[2]/table[2]/tbody/tr/td[3]/p[2]/table/tbody/tr/td/p[1]/table/tbody/tr[2]/td[2]
+
         elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1) > table > tbody ");
 
         person.setContactInformation(elements.get(elements.size()-1).text());
@@ -369,15 +376,7 @@ public class DeputyPresenceParser {
         String presentationText=elements.get(0).text().toLowerCase();
         String presentationTextFlattened= TextUtils.flattenToAscii(presentationText);
         person.setDescription(presentationText);
-        //String personCounty=null;
-        /*
-        for (String county:counties.getCounties()) {
-            if (presentationTextFlattened.contains(TextUtils.flattenToAscii(county))) {
-                personCounty = county;
-                break;
-            }
-        }
-        */
+
 
         if ( presentationTextFlattened.contains("ales la nivel national") || presentationTextFlattened.contains("aleasa la nivel national"))
         {

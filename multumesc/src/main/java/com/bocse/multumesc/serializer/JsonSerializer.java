@@ -9,9 +9,8 @@ import java.io.*;
  * Created by bogdan.bocse on 11/10/2015.
  */
 public class JsonSerializer {
-    public void serialize(String path, Long personId, Object object) throws IOException {
+    public static void serialize(String path, Long personId, Object object) throws IOException {
 
-        String content = "This is the content to write into file";
 
         File file = new File(path+personId+".txt");
 

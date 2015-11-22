@@ -9,10 +9,14 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class Person  {
     private Long personId;
-    private String name;
+    private String fullName;
+    private String firstName;
+    private String lastName;
+    private String pictureURL;
     private String currentParty;
     private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
+
     private Long lastUpdateTimestamp=0L;
     private String description;
     private String contactInformation;
@@ -33,12 +37,12 @@ public class Person  {
         this.personId = personId;
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
 
@@ -153,5 +157,29 @@ public class Person  {
 
     public void setContactInformation(String contactInformation) {
         this.contactInformation = contactInformation;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getPictureURL() {
+        return pictureURL;
+    }
+
+    public void setPictureURL(String pictureURL) {
+        this.pictureURL = pictureURL;
     }
 }
