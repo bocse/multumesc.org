@@ -28,7 +28,7 @@ public class SenatorCrawler {
     private final static Logger logger = Logger.getLogger(SenatorCrawler.class.toString());
     private final List<String> senatorIds= Collections.synchronizedList(new ArrayList<String>());
     private final List< Person> persons = Collections.synchronizedList(new ArrayList<Person>());
-    private final static int threadNumber=5;
+    private final static int threadNumber=1;
     public SenatorCrawler()
     {
 
