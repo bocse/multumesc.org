@@ -1,5 +1,6 @@
 package com.bocse.multumesc.parser;
 
+import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.DomElement;
@@ -44,10 +45,13 @@ public class SenatorPresenceParser {
     private Integer setYear;
     private Integer setMonth;
     private Integer setDay;
-    public SenatorPresenceParser() {
+    private Person person;
+
+    public SenatorPresenceParser(Person person) {
         setYear=new DateTime().getYear();
         setMonth=new DateTime().getMonthOfYear();
         setDay=new DateTime().getDayOfMonth();
+        this.person=person;
     }
 
     public void init() {
@@ -99,7 +103,7 @@ public class SenatorPresenceParser {
         Elements elements=doc.select("#ctl00_B_Center_VoturiPlen1_GridVoturi > tbody > tr");
         if (elements.size()==0)
             return;
-        PrintWriter writer = new PrintWriter("/home/bocse/senat/"+senatorId+"_"+setYear+"_"+setMonth+"_"+setDay+".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("/home/bocse/senat/"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
 
 
 

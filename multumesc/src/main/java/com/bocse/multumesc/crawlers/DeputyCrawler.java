@@ -147,7 +147,7 @@ public class DeputyCrawler {
                 future.get();
             } catch (ExecutionException exex) {
                 exceptionsFound++;
-                exex.getCause().toString();
+                logger.warning(exex.getCause().toString());
             }
         }
 

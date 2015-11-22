@@ -4,6 +4,7 @@ import com.bocse.multumesc.MultumescMain;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.parser.SenatorPresenceParser;
 import com.bocse.multumesc.requester.HttpRequester;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -14,6 +15,10 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 /**
@@ -21,6 +26,9 @@ import java.util.logging.Logger;
  */
 public class SenatorCrawler {
     private final static Logger logger = Logger.getLogger(SenatorCrawler.class.toString());
+    private final List<String> senatorIds= Collections.synchronizedList(new ArrayList<String>());
+    private final List< Person> persons = Collections.synchronizedList(new ArrayList<Person>());
+    private final static int threadNumber=5;
     public SenatorCrawler()
     {
 
@@ -45,6 +53,9 @@ public class SenatorCrawler {
             Element element=elements.get(elementIndex);
             String index=element.child(0).text().trim();
             String fullName=element.child(1).text().trim();
+            Element nameElement=element.child(1).select("a").get(0);
+            String senatorId=nameElement.attr("onclick").split("=")[1].split("\"")[0];
+
             String description=element.child(3).text().trim();
             String colegiu=element.child(4).text().trim();
             String party=element.child(5).text().trim().toUpperCase();
@@ -68,17 +79,46 @@ public class SenatorCrawler {
             person.setContactInformation("");
             person.setPictureURL("");
             person.setCounty("");
-
-
+            persons.add(person);
+            senatorIds.add(senatorId);
+            logger.info(fullName+ " "+ senatorId);
         }
     }
 
-    public void crawlAllSenators()
-    {
+    public void crawlAllSenators() throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
+        List<Future<Object>> futureList = Collections.synchronizedList(new ArrayList<Future<Object>>());
+        if (senatorIds.size() != persons.size())
+            throw new IllegalStateException("List of senators improperly initiliazed");
+        for (Integer personIdIndex = 0; personIdIndex <= senatorIds.size(); personIdIndex++) {
+            final Integer personId=personIdIndex;
+            executorService.submit(new Callable() {
+                public Object call() throws IOException, InterruptedException, ConfigurationException {
 
+                    crawlSenator(persons.get(personId),senatorIds.get(personId));
+                    return new Object();
+                }
+            });
+        }
+        executorService.shutdown();;
+        executorService.awaitTermination(10, TimeUnit.DAYS);
+        Long exceptionsFound = 0L;
+        for (Future<Object> future : futureList) {
+            try {
+                future.get();
+            } catch (ExecutionException exex) {
+                exceptionsFound++;
+                logger.warning(exex.getCause().toString());
+            }
+        }
+
+        if (exceptionsFound > 0L)
+            logger.warning("Data may be corrupted. " + exceptionsFound + " found during execution.");
+        else
+            logger.info("No exceptions during execution.");
     }
 
-    public void crawlSenator(String senatorId) throws IOException, InterruptedException {
+    public void crawlSenator(Person person,String senatorId) throws IOException, InterruptedException {
         DateTime dateCursor=new DateTime().minusDays(4).withTime(0,0,0,1);
         DateTime earliest=new DateTime().withYear(2012).withMonthOfYear(12).withDayOfMonth(19).withTime(0,0,0,1);
 
@@ -86,7 +126,7 @@ public class SenatorCrawler {
         int lastYear=dateCursor.getYear();
         int lastMonth=dateCursor.getMonthOfYear();
 
-        SenatorPresenceParser spp=new SenatorPresenceParser();
+        SenatorPresenceParser spp=new SenatorPresenceParser(person);
         spp.init();
         //"9d0635d5-1743-4696-8acd-e97e070da503"
         spp.initProfilePage(senatorId);
