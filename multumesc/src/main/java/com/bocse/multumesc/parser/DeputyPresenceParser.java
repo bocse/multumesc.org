@@ -1,6 +1,7 @@
 package com.bocse.multumesc.parser;
 
 import com.bocse.multumesc.data.*;
+import com.bocse.multumesc.requester.HttpRequester;
 import com.bocse.multumesc.utils.NameUtils;
 import com.bocse.multumesc.utils.TextUtils;
 import org.apache.http.HttpEntity;
@@ -36,9 +37,7 @@ import java.util.logging.Logger;
 public class DeputyPresenceParser {
 
 
-    private final static Long maxAttempts=10L;
-    private final static Long initialDelay=1300L;
-    private final static Double backoffExponent=1.9;
+
 
     private final static Logger logger = Logger.getLogger(DeputyPresenceParser.class.toString());
     private final static String pattern = "dd.MM.yyyy HH:mm";
@@ -46,7 +45,7 @@ public class DeputyPresenceParser {
     //private HashMap<Long, SubjectMatter> subjectMatters;
 
     public Document getProfileDocument(final Long personId) throws IOException, InterruptedException {
-        return getDocument(createProfileRequestDocument(personId));
+        return HttpRequester.getDocument(createProfileRequestDocument(personId));
     }
 
     private HttpUriRequest createCircumscriptionRequestDocument(final String county, final Long colegiu, final String prefix)
@@ -101,101 +100,10 @@ public class DeputyPresenceParser {
     }
 
     public Document getVoteDocument(final Long personId, final Long eventId) throws IOException, InterruptedException {
-        return getDocument(createVoteRequestDocument(personId, eventId));
+        return HttpRequester.getDocument(createVoteRequestDocument(personId, eventId));
     }
     public Document getCircumscriptionDocument(final String county, final Long colegiu, final String prefix) throws IOException, InterruptedException {
-        return getDocument(createCircumscriptionRequestDocument(county, colegiu, prefix),false);
-    }
-
-    private Document getDocument(HttpUriRequest httpRequest) throws IOException, InterruptedException {
-        return getDocument(httpRequest, true);
-    }
-
-    private Document getDocument(HttpUriRequest httpRequest, final Boolean throwOnEmptyDocument) throws IOException, InterruptedException {
-        Document doc=null;
-        Long delay = initialDelay;
-        Long attemptIndex = 0L;
-        Boolean isSuccess = false;
-        while (!isSuccess & attemptIndex < maxAttempts) {
-            try {
-                final String url = "http://www.cdep.ro/pls/steno/eVot.mp";
-
-
-                CloseableHttpClient httpclient =
-                        HttpClients.custom().
-                                setRetryHandler(new DefaultHttpRequestRetryHandler(5, true))
-
-                                .build();
-
-
-
-
-                try {
-                    ////////////
-//                    HttpUriRequest httppost = new HttpPost(url);
-//
-//                    List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(10);
-//
-//                    nameValuePairs.add(new BasicNameValuePair("idm",
-//                            personId.toString()));
-//                    nameValuePairs.add(new BasicNameValuePair("prn",
-//                            "1"));
-//                    nameValuePairs.add(new BasicNameValuePair("pag",
-//                            eventId.toString()));
-//                    nameValuePairs.add(new BasicNameValuePair("cam",
-//                            "2"));
-//                    nameValuePairs.add(new BasicNameValuePair("idl",
-//                            "1"));
-//                    nameValuePairs.add(new BasicNameValuePair("sns",
-//                            "D"));
-//                    nameValuePairs.add(new BasicNameValuePair("tot",
-//                            "1"));
-//                    httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-                    ////////
-                    // Create a custom response handler
-                    ResponseHandler<Document> responseHandler = new ResponseHandler<Document>() {
-
-
-                        public Document handleResponse(
-                                final HttpResponse response) throws ClientProtocolException, IOException {
-                            int status = response.getStatusLine().getStatusCode();
-                            if (status >= 200 && status < 300) {
-                                HttpEntity entity = response.getEntity();
-                                Document doc = Jsoup.parse(entity.getContent(), "ISO-8859-2", "");
-                                //return entity != null ? EntityUtils.toString(entity) : null;
-                                return doc;
-                            } else {
-                                if (throwOnEmptyDocument)
-                                throw new ClientProtocolException("Unexpected response status: " + status);
-                                else
-                                    return null;
-                            }
-                        }
-
-                    };
-                    doc = httpclient.execute(httpRequest, responseHandler);
-                    //logger.info(doc.text());
-                    //logger.info(doc.html());
-                } finally {
-                    httpclient.close();
-                }
-                isSuccess = true;
-
-            } catch (IOException ex) {
-                logger.warning("Error in performing request for person  " + ex.getMessage());
-                if (attemptIndex < maxAttempts) {
-                    logger.warning("Retry attempt " + attemptIndex + " / " + maxAttempts + ", waiting before retrying" + delay);
-                } else {
-                    logger.warning("Aborting process, after  " + maxAttempts + " attempts over " + delay + "ms");
-                    throw ex;
-                }
-                Thread.sleep((int) (delay.longValue()));
-                attemptIndex++;
-                delay = (long) (delay * backoffExponent + System.nanoTime() % 1000);
-            }
-        }
-        return doc;
+        return HttpRequester.getDocument(createCircumscriptionRequestDocument(county, colegiu, prefix), false);
     }
 
 

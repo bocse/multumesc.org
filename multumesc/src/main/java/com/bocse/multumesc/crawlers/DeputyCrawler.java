@@ -1,5 +1,6 @@
-package com.bocse.multumesc;
+package com.bocse.multumesc.crawlers;
 
+import com.bocse.multumesc.MultumescMain;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;

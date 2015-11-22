@@ -60,8 +60,8 @@ public class SenatorTest
                 spp.setMonthPage(now.getMonthOfYear());
                 lastMonth=now.getMonthOfYear();
             }
-            int dayIndex=(int)((now.getMillis()-reference.getMillis())/1000/3600/24);
-            spp.getVoteList(dayIndex);
+            //int dayIndex=(int)((now.getMillis()-reference.getMillis())/1000/3600/24);
+            spp.getVoteList(now);
             now=now.minusDays(1);
         }
     }

@@ -25,6 +25,8 @@ import java.util.logging.Logger;
  */
 public class SenatorPresenceParser {
     private final static Logger logger = Logger.getLogger(DeputyPresenceParser.class.toString());
+    private static final DateTime reference=new DateTime().withYear(2000).withDayOfMonth(1).withMonthOfYear(1).withTime(0, 0, 0, 1);
+    private DateTime setDate=new DateTime().withTime(0, 0, 0, 1);
     private static final int forcedJsWaitMs = 1;
     private static final int beforeJsMaxWaitMs = 10000;
     private static final int afterJsMaxWaitMs = 10000;
@@ -60,6 +62,7 @@ public class SenatorPresenceParser {
         webClient.getOptions().setRedirectEnabled(true);
 
     }
+
 
     //pagination starts 1 jan 2000 -> day 0
     private void initConnectionWrapper() {
@@ -174,7 +177,14 @@ public class SenatorPresenceParser {
         setYear=yearIndex;
     }
 
-    public void getVoteList(int dayIndex) throws InterruptedException {
+    public void getVoteList(DateTime setDate) throws InterruptedException {
+        if (setDate.getMonthOfYear()!=setMonth)
+            throw new IllegalStateException("Month "+setDate.getMonthOfYear()+" has not been navigated to.");
+        if (setDate.getYear()!=setYear)
+            throw new IllegalStateException("Year "+setDate.getYear()+" has not been navigated to.");
+
+        int dayIndex=(int)((setDate.getMillis()-reference.getMillis())/1000/3600/24);
+        this.setDate=setDate;
         setDay=dayIndex;
         final String javaScriptCodePageX = "__doPostBack('ctl00$B_Center$VoturiPlen1$calVOT','" + dayIndex + "');";
         interceptMode = true;
