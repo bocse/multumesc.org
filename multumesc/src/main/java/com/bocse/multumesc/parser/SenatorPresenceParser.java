@@ -1,5 +1,6 @@
 package com.bocse.multumesc.parser;
 
+import com.bocse.multumesc.data.Vote;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -8,9 +9,14 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.javascript.host.event.Event;
 import com.gargoylesoftware.htmlunit.util.WebConnectionWrapper;
 import org.joda.time.DateTime;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -19,29 +25,35 @@ import java.util.logging.Logger;
  */
 public class SenatorPresenceParser {
     private final static Logger logger = Logger.getLogger(DeputyPresenceParser.class.toString());
+    private static final int forcedJsWaitMs = 1;
+    private static final int beforeJsMaxWaitMs = 10000;
+    private static final int afterJsMaxWaitMs = 10000;
+    private static final String baseURL="http://senat.ro/FisaSenator.aspx?ParlamentarID=";
     //final WebClient webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_11);
     final WebClient webClient = new WebClient(BrowserVersion.FIREFOX_38);
     //final WebClient webClient = new WebClient(BrowserVersion.CHROME);
-    public boolean debugMode=false;
+    public boolean interceptMode = false;
     private String lastPayload;
     private DateTime lastDate;
     private HtmlPage profilePage;
     private HtmlPage votePage;
     private HtmlPage votePageNoPaging;
-
-    public SenatorPresenceParser()
-    {
-
-
+    private String senatorId;
+    private Integer setYear;
+    private Integer setMonth;
+    private Integer setDay;
+    public SenatorPresenceParser() {
+        setYear=new DateTime().getYear();
+        setMonth=new DateTime().getMonthOfYear();
+        setDay=new DateTime().getDayOfMonth();
     }
 
-    public void init()
-    {
+    public void init() {
         initClient();
         initConnectionWrapper();
     }
-    private void initClient()
-    {
+
+    private void initClient() {
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.SEVERE);
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setPopupBlockerEnabled(false);
@@ -50,32 +62,25 @@ public class SenatorPresenceParser {
     }
 
     //pagination starts 1 jan 2000 -> day 0
-    private void initConnectionWrapper()
-    {
-        /*
-        webClient.setAjaxController(new AjaxController(){
-            @Override
-            public boolean processSynchron(HtmlPage page, WebRequest request, boolean async)
-            {
-                return true;
-            }
-        });
-        */
+    private void initConnectionWrapper() {
+
         new WebConnectionWrapper(webClient) {
 
             public WebResponse getResponse(WebRequest request) throws IOException {
                 //Don't let the bastards know
-                //if (request.getUrl().toString().contains("http://www.google-analytics.com/r/collect"))
-                // request.setUrl(new URL("http://devnull-as-a-service.com/dev/null"));
+                if (request.getUrl().toString().contains("http://www.google-analytics.com/"))
+                    request.setUrl(new URL("http://devnull-as-a-service.com/dev/null"));
 
                 WebResponse response = super.getResponse(request);
-                logger.info("Request: "+request.getUrl());
-                if (request.getHttpMethod().name().equals("POST"))
-                {
-                    logger.info("POST DETECTED: "+request.getUrl());
-                    if (debugMode)
-                    logger.info(response.getContentAsString());
-                    //HtmlPage secondLevelPage = HTMLParser.parseHtml(response, webClient.getCurrentWindow());
+                logger.info("Request: " + request.getUrl());
+                if (request.getHttpMethod().name().equals("POST")) {
+                    logger.info("POST DETECTED: " + request.getUrl());
+                    if (interceptMode) {
+                        lastPayload = response.getContentAsString();
+                        handlePayload(lastPayload);
+                        //logger.info(lastPayload);
+
+                    }
 
                 }
 
@@ -85,86 +90,104 @@ public class SenatorPresenceParser {
 
     }
 
-    public void initProfilePage(String url) throws IOException, InterruptedException {
-        profilePage = webClient.getPage(url);
+    public void handlePayload(String payload) throws IOException {
+        //#ctl00_B_Center_VoturiPlen1_GridVoturi > tbody > tr
+        Document doc= Jsoup.parse(payload);
+        Elements elements=doc.select("#ctl00_B_Center_VoturiPlen1_GridVoturi > tbody > tr");
+        if (elements.size()==0)
+            return;
+        PrintWriter writer = new PrintWriter("/home/bocse/senat/"+senatorId+"_"+setYear+"_"+setMonth+"_"+setDay+".txt", "UTF-8");
 
-        logger.info(profilePage.getTitleText());
 
 
-        //javascript:__doPostBack('ctl00$B_Center$meniu$ctl02$Voturi','')
-        //javascript:__doPostBack('ctl00$B_Center$meniu$ctl02$Voturi','')
-        //javascript:__doPostBack('ctl00$B_Center$meniu$ctl02$Voturi','')
+        for (Element element: elements)
+        {
+            writer.println(element.html());
+            writer.println();
+            writer.println();
+            writer.println();
+            writer.println();
+        }
+        writer.close();
+    }
+
+    public void initProfilePage(String senatorId) throws IOException, InterruptedException {
+        this.senatorId=senatorId;
+        profilePage = webClient.getPage(baseURL+senatorId);
 
 
         //TODO: Investigate if can be handled with form submit
         final String javaScriptCode = "__doPostBack('ctl00$B_Center$meniu$ctl02$Voturi','')";
         Object result = profilePage.executeJavaScript(javaScriptCode).getJavaScriptResult();
-        logger.info("Sample:" + result);
         logger.info("Waiting for JS");
-        webClient.waitForBackgroundJavaScriptStartingBefore(10000);
-        webClient.waitForBackgroundJavaScript(10000);
+        webClient.waitForBackgroundJavaScriptStartingBefore(beforeJsMaxWaitMs);
+        webClient.waitForBackgroundJavaScript(afterJsMaxWaitMs);
 
         votePage = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
-        final String pageAsXml = votePage.getWebResponse().getContentAsString();
-        //logger.info(pageAsXml);
         List<DomElement> paginationElement = votePage.getElementsByName("ctl00$B_Center$VoturiPlen1$chkPaginare");
         paginationElement.get(0).click();
         HtmlForm form = votePage.getForms().get(0);
         votePageNoPaging = (HtmlPage) form.fireEvent(Event.TYPE_SUBMIT).getNewPage();
-        webClient.waitForBackgroundJavaScriptStartingBefore(10000);
-        webClient.waitForBackgroundJavaScript(10000);
-        //logger.info(votePageNoPaging.getWebResponse().getContentAsString());
-
-        //CLICK WORKS
-        //paginationElement.get(0).click();
-        //paginationElement.get(0).removeAttribute("checked");
-
-        //final String javaScriptCodePagination ="setTimeout('__doPostBack(\\'ctl00$B_Center$VoturiPlen1$chkPaginare\\',\\'\\')', 0)";
-        //JS NOT WORK
-        //final String javaScriptCodePagination ="__doPostBack('ctl00$B_Center$VoturiPlen1$chkPaginare', '')'";
-        //result = profilePage.executeJavaScript(javaScriptCodePagination).getJavaScriptResult();
-        //logger.info("Waiting for JS");
-        webClient.waitForBackgroundJavaScriptStartingBefore(10000);
-        webClient.waitForBackgroundJavaScript(10000);
-
-
-        //votePageNoPaging=(HtmlPage)webClient.getCurrentWindow().getEnclosedPage();
-        //final String pageAsXml2 = votePageNoPaging.getWebResponse().getContentAsString();
-        //logger.info(pageAsXml2);
-
-        //javascript:__doPostBack('ctl00$B_Center$VoturiPlen1$calVOT','2860')
-
-
+        logger.info("Waiting for JS");
+        webClient.waitForBackgroundJavaScriptStartingBefore(beforeJsMaxWaitMs);
+        webClient.waitForBackgroundJavaScript(afterJsMaxWaitMs);
     }
 
-    public void setMonthPage(int monthIndex)
-    {
-        final String javaScriptCodePageX ="__doPostBack('ctl00$B_Center$VoturiPlen1$calVOT','"+monthIndex+"');";
-        //votePageNoPaging.executeJavaScript()
+    public void setMonthPage(int monthIndex) throws InterruptedException, IOException {
+        List<DomElement> monthElements = votePage.getElementsByName("ctl00$B_Center$VoturiPlen1$drpMonthCal");
+        DomElement monthElement = monthElements.get(0);
+        for (DomElement particularMonth : monthElement.getChildElements()) {
+            particularMonth.removeAttribute("selected");
+        }
+        for (DomElement particularMonth : monthElement.getChildElements()) {
+            if (particularMonth.getAttribute("value").equals(String.valueOf(monthIndex))) {
+                //particularMonth.setAttribute("selected","selected");
+                particularMonth.click();
+                logger.info(particularMonth.getAttribute("selected"));
+            }
+        }
+        //final String javaScriptCodeMonth ="__doPostBack('ctl00$B_Center$VoturiPlen1$drpMonthCal','');";
+        logger.info("Waiting for JS");
+        webClient.waitForBackgroundJavaScriptStartingBefore(beforeJsMaxWaitMs);
+        webClient.waitForBackgroundJavaScript(afterJsMaxWaitMs);
+        Thread.sleep(forcedJsWaitMs);
+        setMonth=monthIndex;
     }
 
-    public void setYearPage()
-    {
+    public void setYearPage(int yearIndex) throws IOException, InterruptedException {
+        List<DomElement> yearElements = votePage.getElementsByName("ctl00$B_Center$VoturiPlen1$drpYearCal");
+        DomElement yearElement = yearElements.get(0);
+        for (DomElement particularMonth : yearElement.getChildElements()) {
+            particularMonth.removeAttribute("selected");
+        }
+        for (DomElement particularYear : yearElement.getChildElements()) {
+            if (particularYear.getAttribute("value").equals(String.valueOf(yearIndex))) {
 
+                particularYear.click();
+                logger.info(particularYear.getAttribute("selected"));
+            }
+        }
+        logger.info("Waiting for JS");
+        webClient.waitForBackgroundJavaScriptStartingBefore(beforeJsMaxWaitMs);
+        webClient.waitForBackgroundJavaScript(afterJsMaxWaitMs);
+        Thread.sleep(forcedJsWaitMs);
+        setYear=yearIndex;
     }
 
-    public void getVoteList(long dayIndex) throws InterruptedException {
-            final String javaScriptCodePageX ="__doPostBack('ctl00$B_Center$VoturiPlen1$calVOT','"+dayIndex+"');";
-            debugMode=true;
-            Object result = votePageNoPaging.executeJavaScript(javaScriptCodePageX).getJavaScriptResult();
-            logger.info("Waiting for JS");
-            webClient.waitForBackgroundJavaScriptStartingBefore(10000);
-            webClient.waitForBackgroundJavaScript(10000);
-            Thread.sleep(1);
+    public void getVoteList(int dayIndex) throws InterruptedException {
+        setDay=dayIndex;
+        final String javaScriptCodePageX = "__doPostBack('ctl00$B_Center$VoturiPlen1$calVOT','" + dayIndex + "');";
+        interceptMode = true;
+        Object result = votePageNoPaging.executeJavaScript(javaScriptCodePageX).getJavaScriptResult();
+        logger.info("Waiting for JS");
+        webClient.waitForBackgroundJavaScriptStartingBefore(beforeJsMaxWaitMs);
+        webClient.waitForBackgroundJavaScript(afterJsMaxWaitMs);
+        Thread.sleep(forcedJsWaitMs);
 
 
-            votePageNoPaging = (HtmlPage)webClient.getCurrentWindow().getEnclosedPage();
-            final String pageAsXmlPageX = votePageNoPaging.getWebResponse().getContentAsString();
-            //logger.info(pageAsXmlPageX);
-            logger.info("TL Windows"+webClient.getTopLevelWindows().size());
-            logger.info("TL Windows"+webClient.getWebWindows().size());
-            //<input id="ctl00_B_Center_VoturiPlen1_chkPaginare" type="checkbox" name="ctl00$B_Center$VoturiPlen1$chkPaginare" checked="checked" onclick="javascript:setTimeout(&#39;__doPostBack(\&#39;ctl00$B_Center$VoturiPlen1$chkPaginare\&#39;,\&#39;\&#39;)&#39;, 0)" /><label for="ctl00_B_Center_VoturiPlen1_chkPaginare">Cu Paginarea Rezultatului</label>
-            debugMode=false;
+        votePageNoPaging = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+        interceptMode = false;
+
     }
 
 }
