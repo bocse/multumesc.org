@@ -64,7 +64,7 @@ public class SenatorPresenceParser {
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
-
+        webClient.getOptions().setThrowExceptionOnScriptError(true);
     }
 
 
