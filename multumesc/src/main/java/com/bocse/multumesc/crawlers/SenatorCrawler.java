@@ -1,6 +1,5 @@
 package com.bocse.multumesc.crawlers;
 
-import com.bocse.multumesc.MultumescMain;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.parser.SenatorPresenceParser;
 import com.bocse.multumesc.requester.HttpRequester;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.*;
 import java.util.logging.Logger;
 

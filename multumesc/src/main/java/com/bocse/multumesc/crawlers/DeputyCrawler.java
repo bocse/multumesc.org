@@ -1,6 +1,6 @@
 package com.bocse.multumesc.crawlers;
 
-import com.bocse.multumesc.MultumescMain;
+import com.bocse.multumesc.MultumescDeputyMain;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * Created by bocse on 22.11.2015.
  */
 public class DeputyCrawler {
-    private final static Logger logger = Logger.getLogger(MultumescMain.class.toString());
+    private final static Logger logger = Logger.getLogger(MultumescDeputyMain.class.toString());
     public final FileConfiguration configuration = new PropertiesConfiguration();
     public final FileConfiguration state = new PropertiesConfiguration();
     public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes = new ConcurrentHashMap<>();

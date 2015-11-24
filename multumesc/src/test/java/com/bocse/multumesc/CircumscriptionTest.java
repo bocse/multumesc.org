@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Unit test for simple MultumescMain.
+ * Unit test for simple MultumescDeputyMain.
  */
 public class CircumscriptionTest
     extends TestCase

@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.TreeMap;
 
 /**
- * Unit test for simple MultumescMain.
+ * Unit test for simple MultumescDeputyMain.
  */
 public class AppTest 
     extends TestCase

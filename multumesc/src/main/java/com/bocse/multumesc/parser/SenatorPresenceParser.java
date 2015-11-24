@@ -34,7 +34,7 @@ public class SenatorPresenceParser {
     private static final int forcedJsWaitMs = 1;
     private static final int beforeJsMaxWaitMs = 10000;
     private static final int afterJsMaxWaitMs = 10000;
-    private static final String baseURL="http://senat.ro/FisaSenator.aspx?ParlamentarID=";
+    private static final String baseURL="http://www.senat.ro/FisaSenator.aspx?ParlamentarID=";
     //final WebClient webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_11);
     private WebClient webClient;
     //final WebClient webClient = new WebClient(BrowserVersion.CHROME);
@@ -65,7 +65,7 @@ public class SenatorPresenceParser {
     }
 
     private void initClient() {
-        String applicationName = "Netscape";
+        String applicationName = "Safari";
         String applicationVersion = "5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36";
         String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36";
         int browserVersionNumeric = 46;
@@ -73,7 +73,7 @@ public class SenatorPresenceParser {
             public boolean hasFeature(BrowserVersionFeatures property) {
 
                 // change features here
-                return BrowserVersion.CHROME.hasFeature(property);
+                return BrowserVersion.INTERNET_EXPLORER_11.hasFeature(property);
             }
         };
         webClient = new WebClient(browser);
@@ -81,13 +81,13 @@ public class SenatorPresenceParser {
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
-        webClient.getOptions().setThrowExceptionOnScriptError(true);
+
 
         webClient.setJavaScriptErrorListener(new JavaScriptErrorListener() {
             @Override
             public void scriptException(InteractivePage interactivePage, ScriptException e) {
-                caughtScriptException=e;
-                caughtInteractivePage=interactivePage;
+                caughtScriptException = e;
+                caughtInteractivePage = interactivePage;
             }
 
             @Override
@@ -105,6 +105,9 @@ public class SenatorPresenceParser {
 
             }
         });
+        webClient.getOptions().setThrowExceptionOnScriptError(false);
+        webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+
     }
 
 
@@ -118,9 +121,14 @@ public class SenatorPresenceParser {
                 try {
                     //Don't let the bastards know
 
-                    if (request.getUrl().toString().contains("http://www.google-analytics.com/"))
-                        request.setUrl(new URL("http://devnull-as-a-service.com/dev/null"));
+                    if (request.getUrl().toString().contains("http://www.google-analytics.com/")||
+                            request.getUrl().toString().contains("ScriptResource.axd")||
+                            request.getUrl().toString().contains("WebResource.axd"))
+                        request.setUrl(new URL("http://adswizz-akila-aws-520.s3.amazonaws.com/tiny.js"));
+
+
                     WebResponse response = super.getResponse(request);
+
                     logger.info("Request: " + request.getUrl());
                     if (request.getHttpMethod().name().equals("POST")) {
                         logger.info("POST DETECTED: " + request.getUrl());
@@ -139,6 +147,15 @@ public class SenatorPresenceParser {
 
                 {
                     logger.warning("Caught a wrapped rabbit.");
+                }
+                try {
+                    request.setUrl(new URL("http://adswizz-akila-aws-520.s3.amazonaws.com/tiny.js"));
+                    WebResponse response = super.getResponse(request);
+                    return response;
+                }
+                catch (Exception ex)
+                {
+                    logger.warning("Caught another wrapped rabbit.");
                 }
                 return null;
             }

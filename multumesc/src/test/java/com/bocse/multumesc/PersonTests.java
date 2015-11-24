@@ -13,7 +13,7 @@ import junit.framework.TestSuite;
 import java.io.IOException;
 
 /**
- * Unit test for simple MultumescMain.
+ * Unit test for simple MultumescDeputyMain.
  */
 public class PersonTests
     extends TestCase

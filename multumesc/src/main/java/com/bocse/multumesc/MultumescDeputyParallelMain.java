@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Multumesc Main app.
  */
-public class MultumescParallelMain {
+public class MultumescDeputyParallelMain {
 
     public static void main(String[] args) throws IOException, InterruptedException, ConfigurationException {
         DeputyCrawler deputyCrawler=new DeputyCrawler(args[0],args[1]);

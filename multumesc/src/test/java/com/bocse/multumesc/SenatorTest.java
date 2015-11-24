@@ -10,7 +10,7 @@ import org.joda.time.DateTime;
 import java.io.IOException;
 
 /**
- * Unit test for simple MultumescMain.
+ * Unit test for simple MultumescDeputyMain.
  */
 public class SenatorTest
     extends TestCase

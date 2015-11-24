@@ -22,8 +22,8 @@ import java.util.logging.Logger;
 /**
  * Multumesc Main app.
  */
-public class MultumescMain {
-    final static Logger logger = Logger.getLogger(MultumescMain.class.toString());
+public class MultumescDeputyMain {
+    final static Logger logger = Logger.getLogger(MultumescDeputyMain.class.toString());
     public final static FileConfiguration configuration = new PropertiesConfiguration();
     public final static FileConfiguration state=new PropertiesConfiguration();
     public final static Map<String, Map<VoteTypes, AtomicLong>> partyVotes=new ConcurrentHashMap<>();
