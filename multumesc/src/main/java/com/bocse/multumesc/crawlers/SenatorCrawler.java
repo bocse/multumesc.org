@@ -28,7 +28,7 @@ public class SenatorCrawler {
     private final static Logger logger = Logger.getLogger(SenatorCrawler.class.toString());
     private final List<String> senatorIds= Collections.synchronizedList(new ArrayList<String>());
     private final List< Person> persons = Collections.synchronizedList(new ArrayList<Person>());
-    private final static int threadNumber=3;
+    private final static int threadNumber=1;
     public SenatorCrawler()
     {
 
@@ -94,7 +94,7 @@ public class SenatorCrawler {
             final Integer personId=personIdIndex;
             executorService.submit(new Callable() {
                 public Object call() throws IOException, InterruptedException, ConfigurationException {
-
+                    Thread.sleep(100*(personId%threadNumber)+System.nanoTime()%200);
                     crawlSenator(persons.get(personId),senatorIds.get(personId));
                     return new Object();
                 }

@@ -7,6 +7,7 @@ import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
+import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.gargoylesoftware.htmlunit.javascript.host.event.Event;
 import com.gargoylesoftware.htmlunit.util.WebConnectionWrapper;
 import org.joda.time.DateTime;
@@ -14,9 +15,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import sun.font.Script;
 
 
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
@@ -33,7 +36,7 @@ public class SenatorPresenceParser {
     private static final int afterJsMaxWaitMs = 10000;
     private static final String baseURL="http://senat.ro/FisaSenator.aspx?ParlamentarID=";
     //final WebClient webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_11);
-    final WebClient webClient = new WebClient(BrowserVersion.FIREFOX_38);
+    private WebClient webClient;
     //final WebClient webClient = new WebClient(BrowserVersion.CHROME);
     public boolean interceptMode = false;
     private String lastPayload;
@@ -46,7 +49,9 @@ public class SenatorPresenceParser {
     private Integer setMonth;
     private Integer setDay;
     private Person person;
-
+    private ScriptException caughtScriptException;
+    private InteractivePage caughtInteractivePage;
+    //private final CollectingJavaScriptErrorListener javaScriptErrorListener = new CollectingJavaScriptErrorListener();
     public SenatorPresenceParser(Person person) {
         setYear=new DateTime().getYear();
         setMonth=new DateTime().getMonthOfYear();
@@ -60,11 +65,46 @@ public class SenatorPresenceParser {
     }
 
     private void initClient() {
+        String applicationName = "Netscape";
+        String applicationVersion = "5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36";
+        String userAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36";
+        int browserVersionNumeric = 46;
+        BrowserVersion browser = new BrowserVersion(applicationName, applicationVersion, userAgent, browserVersionNumeric) {
+            public boolean hasFeature(BrowserVersionFeatures property) {
+
+                // change features here
+                return BrowserVersion.CHROME.hasFeature(property);
+            }
+        };
+        webClient = new WebClient(browser);
         java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(java.util.logging.Level.SEVERE);
         webClient.getOptions().setJavaScriptEnabled(true);
         webClient.getOptions().setPopupBlockerEnabled(false);
         webClient.getOptions().setRedirectEnabled(true);
         webClient.getOptions().setThrowExceptionOnScriptError(true);
+
+        webClient.setJavaScriptErrorListener(new JavaScriptErrorListener() {
+            @Override
+            public void scriptException(InteractivePage interactivePage, ScriptException e) {
+                caughtScriptException=e;
+                caughtInteractivePage=interactivePage;
+            }
+
+            @Override
+            public void timeoutError(InteractivePage interactivePage, long l, long l1) {
+
+            }
+
+            @Override
+            public void malformedScriptURL(InteractivePage interactivePage, String s, MalformedURLException e) {
+
+            }
+
+            @Override
+            public void loadScriptError(InteractivePage interactivePage, URL url, Exception e) {
+
+            }
+        });
     }
 
 
@@ -73,26 +113,36 @@ public class SenatorPresenceParser {
 
         new WebConnectionWrapper(webClient) {
 
-            public WebResponse getResponse(WebRequest request) throws IOException {
-                //Don't let the bastards know
-                if (request.getUrl().toString().contains("http://www.google-analytics.com/"))
-                    request.setUrl(new URL("http://devnull-as-a-service.com/dev/null"));
+            public WebResponse getResponse(WebRequest request)  {
 
-                WebResponse response = super.getResponse(request);
-                logger.info("Request: " + request.getUrl());
-                if (request.getHttpMethod().name().equals("POST")) {
-                    logger.info("POST DETECTED: " + request.getUrl());
-                    if (interceptMode) {
-                        lastPayload = response.getContentAsString();
-                        handlePayload(lastPayload);
-                        //logger.info(lastPayload);
+                try {
+                    //Don't let the bastards know
+
+                    if (request.getUrl().toString().contains("http://www.google-analytics.com/"))
+                        request.setUrl(new URL("http://devnull-as-a-service.com/dev/null"));
+                    WebResponse response = super.getResponse(request);
+                    logger.info("Request: " + request.getUrl());
+                    if (request.getHttpMethod().name().equals("POST")) {
+                        logger.info("POST DETECTED: " + request.getUrl());
+                        if (interceptMode) {
+                            lastPayload = response.getContentAsString();
+                            handlePayload(lastPayload);
+                            //logger.info(lastPayload);
+
+                        }
 
                     }
 
+                    return response;
                 }
+                catch (Exception ex)
 
-                return response;
+                {
+                    logger.warning("Caught a wrapped rabbit.");
+                }
+                return null;
             }
+
         };
 
     }
@@ -103,8 +153,8 @@ public class SenatorPresenceParser {
         Elements elements=doc.select("#ctl00_B_Center_VoturiPlen1_GridVoturi > tbody > tr");
         if (elements.size()==0)
             return;
-        PrintWriter writer = new PrintWriter("/home/bocse/senat/"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
-
+        //PrintWriter writer = new PrintWriter("/home/bocse/senat/"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("C://Temp//Senat//"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
 
 
         for (Element element: elements)
@@ -182,26 +232,45 @@ public class SenatorPresenceParser {
     }
 
     public void getVoteList(DateTime setDate) throws InterruptedException {
-        if (setDate.getMonthOfYear()!=setMonth)
-            throw new IllegalStateException("Month "+setDate.getMonthOfYear()+" has not been navigated to.");
-        if (setDate.getYear()!=setYear)
-            throw new IllegalStateException("Year "+setDate.getYear()+" has not been navigated to.");
+        boolean mustRetry=true;
+        while(mustRetry) {
+            try {
+                caughtScriptException = null;
+                if (setDate.getMonthOfYear() != setMonth)
+                    throw new IllegalStateException("Month " + setDate.getMonthOfYear() + " has not been navigated to.");
+                if (setDate.getYear() != setYear)
+                    throw new IllegalStateException("Year " + setDate.getYear() + " has not been navigated to.");
 
-        int dayIndex=(int)((setDate.getMillis()-reference.getMillis())/1000/3600/24);
-        this.setDate=setDate;
-        setDay=dayIndex;
-        final String javaScriptCodePageX = "__doPostBack('ctl00$B_Center$VoturiPlen1$calVOT','" + dayIndex + "');";
-        interceptMode = true;
-        Object result = votePageNoPaging.executeJavaScript(javaScriptCodePageX).getJavaScriptResult();
-        logger.info("Waiting for JS");
-        webClient.waitForBackgroundJavaScriptStartingBefore(beforeJsMaxWaitMs);
-        webClient.waitForBackgroundJavaScript(afterJsMaxWaitMs);
-        Thread.sleep(forcedJsWaitMs);
+                int dayIndex = (int) ((setDate.getMillis() - reference.getMillis()) / 1000 / 3600 / 24);
+                this.setDate = setDate;
+                setDay = dayIndex;
+                final String javaScriptCodePageX = "__doPostBack('ctl00$B_Center$VoturiPlen1$calVOT','" + dayIndex + "');";
+                interceptMode = true;
+                Object result = votePageNoPaging.executeJavaScript(javaScriptCodePageX).getJavaScriptResult();
+                logger.info("Waiting for JS");
+                webClient.waitForBackgroundJavaScriptStartingBefore(beforeJsMaxWaitMs);
+                webClient.waitForBackgroundJavaScript(afterJsMaxWaitMs);
+                Thread.sleep(forcedJsWaitMs);
 
+                if (caughtScriptException != null) {
+                    logger.info(caughtScriptException.getMessage());
+                    //logger.info(caughtScriptException.getPage().asXml());
+                    logger.info("Javascript exception");
+                    mustRetry=true;
+                    continue;
 
-        votePageNoPaging = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
-        interceptMode = false;
+                }
 
+                votePageNoPaging = (HtmlPage) webClient.getCurrentWindow().getEnclosedPage();
+                interceptMode = false;
+                logger.info("Successfully parsed "+person.getPersonId()+" "+setDate.toString()+" "+dayIndex + " "+person.getFullName());
+                mustRetry=false;
+            } catch (Exception ex) {
+                logger.warning("We caught it!");
+                ex.printStackTrace();
+                mustRetry=true;
+            }
+        }
     }
 
 }
