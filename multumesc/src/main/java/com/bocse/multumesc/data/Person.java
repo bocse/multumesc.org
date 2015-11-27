@@ -28,6 +28,8 @@ public class Person  {
     private Map<VoteTypes, AtomicLong> statsLast90Days=new ConcurrentHashMap<>();
     private Map<VoteTypes, AtomicLong> statsLast365Days=new ConcurrentHashMap<>();
     private Map<VoteTypes, AtomicLong> statsAllTerm=new ConcurrentHashMap<>();
+    private List<Double> attendancePerWeek=new ArrayList<>();
+    private List<Double> attendancePerWeekExcludingVacation=new ArrayList<>();
 
     public Long getPersonId() {
         return personId;
@@ -181,5 +183,21 @@ public class Person  {
 
     public void setPictureURL(String pictureURL) {
         this.pictureURL = pictureURL;
+    }
+
+    public List<Double> getAttendancePerWeek() {
+        return attendancePerWeek;
+    }
+
+    public void setAttendancePerWeek(List<Double> attendancePerWeek) {
+        this.attendancePerWeek = attendancePerWeek;
+    }
+
+    public List<Double> getAttendancePerWeekExcludingVacation() {
+        return attendancePerWeekExcludingVacation;
+    }
+
+    public void setAttendancePerWeekExcludingVacation(List<Double> attendancePerWeekExcludingVacation) {
+        this.attendancePerWeekExcludingVacation = attendancePerWeekExcludingVacation;
     }
 }

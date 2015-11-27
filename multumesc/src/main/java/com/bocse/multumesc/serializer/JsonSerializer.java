@@ -9,10 +9,10 @@ import java.io.*;
  * Created by bogdan.bocse on 11/10/2015.
  */
 public class JsonSerializer {
-    public static void serialize(String path, Long personId, Object object) throws IOException {
+    public static void serialize(String path,  Object object) throws IOException {
 
 
-        File file = new File(path+personId+".txt");
+        File file = new File(path);
 
         // if file doesnt exists, then create it
         if (!file.exists()) {

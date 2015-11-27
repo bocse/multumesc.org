@@ -121,9 +121,11 @@ public class SenatorPresenceParser {
                 try {
                     //Don't let the bastards know
 
-                    if (request.getUrl().toString().contains("http://www.google-analytics.com/")||
-                            request.getUrl().toString().contains("ScriptResource.axd")||
-                            request.getUrl().toString().contains("WebResource.axd"))
+                    if (
+                            request.getUrl().toString().contains("http://www.google-analytics.com/")
+                            //||request.getUrl().toString().contains("ScriptResource.axd")||
+                            //request.getUrl().toString().contains("WebResource.axd")
+                            )
                         request.setUrl(new URL("http://adswizz-akila-aws-520.s3.amazonaws.com/tiny.js"));
 
 

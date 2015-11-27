@@ -36,6 +36,7 @@ public class DeputyCrawler {
     public Long maxPerson;
     public Long firstPerson;
     public Integer threadNumber;
+    public final static String fileSuffix=".txt";
 
     public DeputyCrawler(String configFile, String stateFile) {
         this.configFile = configFile;
@@ -92,15 +93,17 @@ public class DeputyCrawler {
                         person.setStatsLast90Days(last90Stats);
                         person.setStatsLast365Days(last365Stats);
 
+                        person.setAttendancePerWeek(stats.processWeeklyAttendence());
+                        person.setAttendancePerWeekExcludingVacation(stats.processWeeklyAttendenceExclusingVacation());
                         SortedMap<Long, Vote> tempVote = person.getVoteMap();
                         person.setVoteMap(null);
-                        JsonSerializer.serialize(configuration.getString("output.profileStats.path"), personId, person);
+                        JsonSerializer.serialize(configuration.getString("output.profileStats.path")+ personId+fileSuffix, person);
 
                         person.setVoteMap(tempVote);
-                        JsonSerializer.serialize(configuration.getString("output.profile.path"), personId, person);
+                        JsonSerializer.serialize(configuration.getString("output.profile.path")+ personId+fileSuffix, person);
                         //
                         if (personId % 10 == 1 || personId == maxPerson)
-                            JsonSerializer.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
+                            JsonSerializer.serialize(configuration.getString("output.subject.path")+fileSuffix, subjectMatters);
                         //
                         persons.put(person.getFullName(), person);
                         if (person.getActive()) {
@@ -112,7 +115,7 @@ public class DeputyCrawler {
                             partyResults.put(90, stats.processPartyFromPerson(partyVotes, personWrapper, 90));
                             partyResults.put(365, stats.processPartyFromPerson(partyVotes, personWrapper, 365));
                             partyResults.put(-1, stats.processPartyFromPerson(partyVotes, personWrapper, -1));
-                            JsonSerializer.serialize(configuration.getString("output.partyStats.path"), 1L, partyResults);
+                            JsonSerializer.serialize(configuration.getString("output.partyStats.path")+"_1"+fileSuffix, partyResults);
 
                             //Compute party - version 1
                             partyResults = new HashMap<>();
@@ -120,7 +123,7 @@ public class DeputyCrawler {
                             partyResults.put(90, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(90), new DateTime()));
                             partyResults.put(365, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(365), new DateTime()));
                             partyResults.put(-1, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(9999), new DateTime()));
-                            JsonSerializer.serialize(configuration.getString("output.partyStats.path"), 2L, partyResults);
+                            JsonSerializer.serialize(configuration.getString("output.partyStats.path")+"_2"+fileSuffix, partyResults);
                         } else {
                             logger.info("Person " + person.getPersonId() + " is not active, so it will not be added to party " + person.getCurrentParty() + " stats.");
                         }
@@ -158,7 +161,7 @@ public class DeputyCrawler {
         for (Person p : persons.values()) {
             p.setVoteMap(null);
         }
-        JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path"), 0L, persons);
+        JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, persons);
         setStateProperty("finalizedCrawls.lastTimestamp", System.currentTimeMillis());
         setStateProperty("partialCrawls.lastProfile", 0L);
     }

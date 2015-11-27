@@ -29,6 +29,9 @@ public class MultumescDeputyMain {
     public final static Map<String, Map<VoteTypes, AtomicLong>> partyVotes=new ConcurrentHashMap<>();
     public final static Map<String, Map<VoteTypes, AtomicLong>> partyVotes2=new ConcurrentHashMap<>();
     public final static Map<String, Person> persons=new ConcurrentHashMap<String, Person>();
+    public final static String fileSuffix=".txt";
+
+
     public static void main(String[] args) throws IOException, InterruptedException, ConfigurationException {
         if (new File(args[1]).exists())
             state.load(args[1]);
@@ -72,12 +75,12 @@ public class MultumescDeputyMain {
 
                 SortedMap<Long, Vote> tempVote=person.getVoteMap();
                 person.setVoteMap(null);
-                jser.serialize(configuration.getString("output.profileStats.path"), personId, person);
+                jser.serialize(configuration.getString("output.profileStats.path")+ personId+fileSuffix, person);
 
                 person.setVoteMap(tempVote);
-                jser.serialize(configuration.getString("output.profile.path"), personId, person);
+                jser.serialize(configuration.getString("output.profile.path")+ personId+fileSuffix, person);
                 if (personId % 10==1 || personId==maxPerson)
-                    jser.serialize(configuration.getString("output.subject.path"), 0L, subjectMatters);
+                    jser.serialize(configuration.getString("output.subject.path")+fileSuffix, subjectMatters);
                 persons.put(person.getFullName(), person);
                 if (person.getActive()) {
                     //Compute party - version 1
@@ -88,7 +91,7 @@ public class MultumescDeputyMain {
                     partyResults.put(90, stats.processPartyFromPerson(partyVotes, personWrapper, 90));
                     partyResults.put(365, stats.processPartyFromPerson(partyVotes, personWrapper, 365));
                     partyResults.put(-1, stats.processPartyFromPerson(partyVotes, personWrapper, -1));
-                    jser.serialize(configuration.getString("output.partyStats.path"), 1L, partyResults);
+                    jser.serialize(configuration.getString("output.partyStats.path")+"_1"+fileSuffix, partyResults);
 
                     //Compute party - version 1
                     partyResults = new HashMap<>();
@@ -96,7 +99,7 @@ public class MultumescDeputyMain {
                     partyResults.put(90, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(90), new DateTime()));
                     partyResults.put(365, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(365), new DateTime()));
                     partyResults.put(-1, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(9999), new DateTime()));
-                    jser.serialize(configuration.getString("output.partyStats.path"), 2L, partyResults);
+                    jser.serialize(configuration.getString("output.partyStats.path")+"_2"+fileSuffix, partyResults);
                 }
                 else
                 {
@@ -115,7 +118,7 @@ public class MultumescDeputyMain {
         {
             p.setVoteMap(null);
         }
-        jser.serialize(configuration.getString("output.profileStatsTogether.path"), 0L, persons);
+        jser.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, persons);
         state.setProperty("finalizedCrawls.lastTimestamp", System.currentTimeMillis());
         state.setProperty("partialCrawls.lastProfile", 0L);
     }
