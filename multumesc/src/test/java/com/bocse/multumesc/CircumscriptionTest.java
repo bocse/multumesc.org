@@ -46,7 +46,7 @@ public class CircumscriptionTest
         counties.add("CLUJ");
         List<Location> locations=pp.getAllCircumscriptions();
         JsonSerializer jsonSerializer=new JsonSerializer();
-        jsonSerializer.serialize("C:\\Temp\\countyList"+".txt", locations);
+        JsonSerializer.serialize("C:\\Temp\\countyList" + ".txt", locations);
         //byte[] latin2JsonString =  jsonString.getBytes("UTF-8");
         //System.out.println(jsonString);
 

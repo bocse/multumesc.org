@@ -98,7 +98,7 @@ public class SenatorCrawler {
                 }
             });
         }
-        executorService.shutdown();;
+        executorService.shutdown();
         executorService.awaitTermination(10, TimeUnit.DAYS);
         Long exceptionsFound = 0L;
         for (Future<Object> future : futureList) {

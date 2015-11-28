@@ -50,7 +50,7 @@ public class HttpRequester {
 
 
                         public Document handleResponse(
-                                final HttpResponse response) throws ClientProtocolException, IOException {
+                                final HttpResponse response) throws IOException {
                             int status = response.getStatusLine().getStatusCode();
                             if (status >= 200 && status < 300) {
                                 HttpEntity entity = response.getEntity();

@@ -1,12 +1,14 @@
 package com.bocse.multumesc.crawlers;
 
-import com.bocse.multumesc.MultumescDeputyMain;
+
+import com.bocse.multumesc.MultumescDeputyParallelMain;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
 import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
 import com.bocse.multumesc.statistics.StatsProcessor;
+import com.bocse.multumesc.uploader.FTPUploader;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -23,12 +25,12 @@ import java.util.logging.Logger;
  * Created by bocse on 22.11.2015.
  */
 public class DeputyCrawler {
-    private final static Logger logger = Logger.getLogger(MultumescDeputyMain.class.toString());
+    private final static Logger logger = Logger.getLogger(MultumescDeputyParallelMain.class.toString());
     public final FileConfiguration configuration = new PropertiesConfiguration();
     public final FileConfiguration state = new PropertiesConfiguration();
     public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes = new ConcurrentHashMap<>();
     public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes2 = new ConcurrentHashMap<>();
-    public final Map<String, Person> persons = new ConcurrentHashMap<String, Person>();
+    public final Map<String, Person> persons = new ConcurrentHashMap<>();
     public final SortedMap<Long, String> subjectMatters = new ConcurrentSkipListMap<>();
     private final String configFile;
     private final String stateFile;
@@ -37,6 +39,7 @@ public class DeputyCrawler {
     public Long firstPerson;
     public Integer threadNumber;
     public final static String fileSuffix=".txt";
+    public FTPUploader ftp;
 
     public DeputyCrawler(String configFile, String stateFile) {
         this.configFile = configFile;
@@ -47,7 +50,7 @@ public class DeputyCrawler {
         state.setProperty(key, value);
     }
 
-    public void init() throws ConfigurationException {
+    public void init() throws ConfigurationException, IOException {
         if (new File(stateFile).exists())
             state.load(stateFile);
         state.setFileName(stateFile);
@@ -64,6 +67,15 @@ public class DeputyCrawler {
                 firstPerson = Math.max(firstPerson, 1 + state.getLong("partialCrawls.lastProfile", 1L));
         } else if (configuration.getBoolean("working.mode.resumeLastCrawl")) {
             logger.warning("Resume automatic crawl turned off.");
+        }
+        if (configuration.getBoolean("upload.ftp.enabled", false)) {
+            ftp = new FTPUploader(
+                    configuration.getString("upload.ftp.hostname"),
+                    configuration.getInt("upload.ftp.port"),
+                    configuration.getString("upload.ftp.username"),
+                    configuration.getString("upload.ftp.password"));
+            ftp.init();
+
         }
     }
 
@@ -97,10 +109,19 @@ public class DeputyCrawler {
                         person.setAttendancePerWeekExcludingVacation(stats.processWeeklyAttendenceExclusingVacation());
                         SortedMap<Long, Vote> tempVote = person.getVoteMap();
                         person.setVoteMap(null);
-                        JsonSerializer.serialize(configuration.getString("output.profileStats.path")+ personId+fileSuffix, person);
+                        File profileStatsFile=JsonSerializer.serialize(configuration.getString("output.profileStats.path")+ personId+fileSuffix, person);
+                        if (configuration.getBoolean("upload.ftp.enabled", false))
+                        {
+                            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+profileStatsFile.getName(), profileStatsFile);
+                        }
 
                         person.setVoteMap(tempVote);
-                        JsonSerializer.serialize(configuration.getString("output.profile.path")+ personId+fileSuffix, person);
+                        File profileFile=JsonSerializer.serialize(configuration.getString("output.profile.path")+ personId+fileSuffix, person);
+//                        if (configuration.getBoolean("upload.ftp.enabled", false))
+//                        {
+//                            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+profileFile, profileFile);
+//                        }
+
                         //
                         if (personId % 10 == 1 || personId == maxPerson)
                             JsonSerializer.serialize(configuration.getString("output.subject.path")+fileSuffix, subjectMatters);
@@ -117,7 +138,7 @@ public class DeputyCrawler {
                             partyResults.put(-1, stats.processPartyFromPerson(partyVotes, personWrapper, -1));
                             JsonSerializer.serialize(configuration.getString("output.partyStats.path")+"_1"+fileSuffix, partyResults);
 
-                            //Compute party - version 1
+                            //Compute party - version 2
                             partyResults = new HashMap<>();
                             partyResults.put(30, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(30), new DateTime()));
                             partyResults.put(90, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(90), new DateTime()));
@@ -161,8 +182,24 @@ public class DeputyCrawler {
         for (Person p : persons.values()) {
             p.setVoteMap(null);
         }
-        JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, persons);
-        setStateProperty("finalizedCrawls.lastTimestamp", System.currentTimeMillis());
+        File profileStatsTogetherFile=JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, persons);
+        File partyStatsFile1=new File(configuration.getString("output.partyStats.path")+"_1"+fileSuffix);
+        File partyStatsFile2=new File(configuration.getString("output.partyStats.path")+"_1"+fileSuffix);
+        File subjectFile=new File(configuration.getString("output.subject.path")+fileSuffix);
+        if (configuration.getBoolean("upload.ftp.enabled", false))
+        {
+            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+profileStatsTogetherFile.getName(), profileStatsTogetherFile);
+            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+partyStatsFile1.getName(), partyStatsFile1);
+            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+partyStatsFile2.getName(), partyStatsFile2);
+            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+subjectFile.getName(), subjectFile);
+        }
+
+
+        if (configuration.getBoolean("upload.ftp.enabled", false))
+        {
+            ftp.disconnect();
+        }
+            setStateProperty("finalizedCrawls.lastTimestamp", System.currentTimeMillis());
         setStateProperty("partialCrawls.lastProfile", 0L);
     }
 

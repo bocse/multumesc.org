@@ -31,11 +31,11 @@ public class Counties {
     }
 
     public List<String> getCounties(){
-        return new ArrayList<String>(counties.keySet());
+        return new ArrayList<>(counties.keySet());
     }
 
     public List<String> getCountiesFlattened() {
-        return new ArrayList<String>(countiesFlattened.keySet());
+        return new ArrayList<>(countiesFlattened.keySet());
     }
 
 

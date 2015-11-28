@@ -78,7 +78,7 @@ public class DeputyPresenceParser {
         final RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectionRequestTimeout(9000).setConnectTimeout(9000).setSocketTimeout(9000).build();
         httppost.setConfig(requestConfig);
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(10);
+        List<NameValuePair> nameValuePairs = new ArrayList<>(10);
 
         nameValuePairs.add(new BasicNameValuePair("idm",
                 personId.toString()));
@@ -298,7 +298,7 @@ public class DeputyPresenceParser {
                 int index1 = presentationText.indexOf(markerString, 0) + markerString.length();
                 int index2 = presentationText.indexOf(",", index1);
                 String countyString = presentationText.substring(index1, index2);
-                person.setCounty(TextUtils.flattenToAscii(countyString.split(" ")[1]));;
+                person.setCounty(TextUtils.flattenToAscii(countyString.split(" ")[1]));
             }
 
             {
@@ -360,8 +360,8 @@ public class DeputyPresenceParser {
     public List<Location> getAllCircumscriptions(List<String> countiesFlattened) throws IOException, InterruptedException {
         Counties counties=new Counties();
         List<Location> locations=new ArrayList<>();
-        Set<String> countiesReceived=new HashSet<String>();
-        Set<String> emptyCounty=new HashSet<String>();
+        Set<String> countiesReceived=new HashSet<>();
+        Set<String> emptyCounty=new HashSet<>();
         for (String county : countiesFlattened) {
             Long circumscription = counties.getCircumscription(county);
             boolean somethingSet=false;

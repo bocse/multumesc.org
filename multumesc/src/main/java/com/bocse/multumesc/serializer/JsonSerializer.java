@@ -9,7 +9,7 @@ import java.io.*;
  * Created by bogdan.bocse on 11/10/2015.
  */
 public class JsonSerializer {
-    public static void serialize(String path,  Object object) throws IOException {
+    public static File serialize(String path,  Object object) throws IOException {
 
 
         File file = new File(path);
@@ -27,22 +27,7 @@ public class JsonSerializer {
         //byte[] utf8JsonString = new String(latin2JsonString, "ISO-8859-2").getBytes("UTF-8");
         fos.write(latin2JsonString);
         fos.close();
-        /*
-        FileWriter fw = new FileWriter(file.getAbsoluteFile());
-        BufferedWriter bw = new BufferedWriter(fw);
 
-
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        String jsonString=gson.toJson(object);
-
-        byte[] utf8JsonString = jsonString.getBytes("UTF8");
-
-        bw.write
-        bw.write(utf8JsonString, 0, utf8JsonString.length);
-        bw.write(jsonString);
-
-        //object.writeJSONString(bw);
-        bw.close();
-        */
+        return file;
     }
 }
