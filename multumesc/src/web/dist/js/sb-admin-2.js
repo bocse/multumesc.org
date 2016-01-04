@@ -1,3 +1,4 @@
+/*
 $(function() {
 
     $('#side-menu').metisMenu();
@@ -34,3 +35,4 @@ $(function() {
         element.addClass('active');
     }
 });
+*/
