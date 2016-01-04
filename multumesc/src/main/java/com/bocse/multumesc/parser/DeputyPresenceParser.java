@@ -14,6 +14,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
@@ -42,6 +43,9 @@ public class DeputyPresenceParser {
     private final static Logger logger = Logger.getLogger(DeputyPresenceParser.class.toString());
     private final static String pattern = "dd.MM.yyyy HH:mm";
     private final static DateTimeFormatter dateTimeFormat=DateTimeFormat.forPattern(pattern);
+    private final int connectionRequestTimeout=20000;
+    private final int connectionTimeout=20000;
+    private final int socketTimeout=60000;
     //private HashMap<Long, SubjectMatter> subjectMatters;
 
     public Document getProfileDocument(final Long personId) throws IOException, InterruptedException {
@@ -53,7 +57,7 @@ public class DeputyPresenceParser {
         final String url ="http://www.becparlamentare2012.ro/"+prefix+colegiu.toString()+"-"+county+".html";
         final HttpGet httpGet = new HttpGet(url);
         final RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(9000).setConnectTimeout(9000).setSocketTimeout(9000).build();
+                .setConnectionRequestTimeout(connectionRequestTimeout).setConnectTimeout(connectionTimeout).setSocketTimeout(socketTimeout).build();
         httpGet.setConfig(requestConfig);
         logger.info("Executing request " + httpGet.getRequestLine() + " county " + county + " colegiu " + colegiu  );
         return httpGet;
@@ -66,17 +70,50 @@ public class DeputyPresenceParser {
         final String url = "http://www.cdep.ro/pls/parlam/structura.mp?idm="+personId+"&cam=2&leg=2012&idl=1";
         final HttpGet httpGet = new HttpGet(url);
         final RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(9000).setConnectTimeout(9000).setSocketTimeout(9000).build();
+                .setConnectionRequestTimeout(connectionRequestTimeout).setConnectTimeout(connectionTimeout).setSocketTimeout(socketTimeout).build();
         httpGet.setConfig(requestConfig);
         logger.info("Executing request " + httpGet.getRequestLine() + " person " + personId );
         return httpGet;
 
     }
-    private HttpUriRequest createVoteRequestDocument(final Long personId, final Long eventId) throws UnsupportedEncodingException {
+    //http://www.cdep.ro/pls/steno/evot2015.mp?idm=8&tot=1&pag=3
+
+    private HttpUriRequest createVoteNewRequestDocument(final Long personId, final Long eventId) throws UnsupportedEncodingException {
+        final String url = "http://www.cdep.ro/pls/steno/evot2015.mp?";
+        List<NameValuePair> nameValuePairs = new ArrayList<>(10);
+
+        nameValuePairs.add(new BasicNameValuePair("idm",
+                personId.toString()));
+//        nameValuePairs.add(new BasicNameValuePair("prn",
+//                "1"));
+        nameValuePairs.add(new BasicNameValuePair("pag",
+                eventId.toString()));
+//        nameValuePairs.add(new BasicNameValuePair("cam",
+//                "2"));
+//        nameValuePairs.add(new BasicNameValuePair("idl",
+//                "1"));
+//        nameValuePairs.add(new BasicNameValuePair("sns",
+//                "D"));
+        nameValuePairs.add(new BasicNameValuePair("tot",
+                "1"));
+        String paramString = URLEncodedUtils.format(nameValuePairs, "utf-8");
+
+        String newUrl = url+ paramString;
+        final HttpGet httppost = new HttpGet(newUrl);
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(connectionRequestTimeout).setConnectTimeout(connectionTimeout).setSocketTimeout(socketTimeout).build();
+        httppost.setConfig(requestConfig);
+
+        logger.info("Executing request " + httppost.getRequestLine() + " person " + personId + " page " + eventId);
+        return httppost;
+    }
+
+    @Deprecated
+    private HttpUriRequest createVoteOldRequestDocument(final Long personId, final Long eventId) throws UnsupportedEncodingException {
         final String url = "http://www.cdep.ro/pls/steno/eVot.mp";
         final HttpPost httppost = new HttpPost(url);
         final RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectionRequestTimeout(9000).setConnectTimeout(9000).setSocketTimeout(9000).build();
+                .setConnectionRequestTimeout(connectionRequestTimeout).setConnectTimeout(connectionTimeout).setSocketTimeout(socketTimeout).build();
         httppost.setConfig(requestConfig);
         List<NameValuePair> nameValuePairs = new ArrayList<>(10);
 
@@ -100,7 +137,7 @@ public class DeputyPresenceParser {
     }
 
     public Document getVoteDocument(final Long personId, final Long eventId) throws IOException, InterruptedException {
-        return HttpRequester.getDocument(createVoteRequestDocument(personId, eventId));
+        return HttpRequester.getDocument(createVoteNewRequestDocument(personId, eventId));
     }
     public Document getCircumscriptionDocument(final String county, final Long colegiu, final String prefix) throws IOException, InterruptedException {
         return HttpRequester.getDocument(createCircumscriptionRequestDocument(county, colegiu, prefix), false);
@@ -111,8 +148,10 @@ public class DeputyPresenceParser {
     {
         Long foundElements=0L;
         Long parsingErrors=0L;
-        Elements elements=doc.select("#pageContent > table:last-child > tbody > tr");
+        //Elements elements=doc.select("#pageContent > table:last-child > tbody > tr");
 
+        //
+        Elements elements=doc.select("#olddiv > table > tbody:eq(0) > tr");
         for (int elementIndex=1; elementIndex<elements.size(); elementIndex++ ) {
 
             Element element = elements.get(elementIndex);
