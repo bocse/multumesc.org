@@ -43,9 +43,9 @@ public class DeputyPresenceParser {
     private final static Logger logger = Logger.getLogger(DeputyPresenceParser.class.toString());
     private final static String pattern = "dd.MM.yyyy HH:mm";
     private final static DateTimeFormatter dateTimeFormat=DateTimeFormat.forPattern(pattern);
-    private final int connectionRequestTimeout=20000;
-    private final int connectionTimeout=20000;
-    private final int socketTimeout=60000;
+    private final int connectionRequestTimeout=30000;
+    private final int connectionTimeout=30000;
+    private final int socketTimeout=99000;
     //private HashMap<Long, SubjectMatter> subjectMatters;
 
     public Document getProfileDocument(final Long personId) throws IOException, InterruptedException {
