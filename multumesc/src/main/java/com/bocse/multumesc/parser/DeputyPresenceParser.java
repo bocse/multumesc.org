@@ -284,8 +284,11 @@ public class DeputyPresenceParser {
         Long parsingErrors=0L;
         Counties counties=new Counties();
         Elements elements=doc.select(".headline");
-        String name=elements.first().text();
+        String name=elements.first().text().split(",")[0];
+        if (name.contains("Sinteza"))
         name=name.substring(0, name.indexOf("Sinteza")).trim();
+        else
+        name=name.trim();
         //logger.info(elements.first().text());
         //logger.getFullName();
         person.setFullName(name);
@@ -298,20 +301,40 @@ public class DeputyPresenceParser {
         else
             person.setPictureURL("");
 
-        elements=doc.select("table:eq(3) > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr");//> tr > td:eq(2) > p:eq(3) > table  > tr > td > p:eq(2) > table > tr:eq(2) > td:eq(2) > table");
+        int foundPartyElementIndex=-1;
+        for (int partyElementIndex=5; partyElementIndex>=3; partyElementIndex-=2) {
+            elements = doc.select("table:eq("+partyElementIndex+") ");
+            if (elements.text().contains("Formaţiunea politică"))
+            {
+                foundPartyElementIndex=partyElementIndex;
+                break;
+            }
+        }
+        //Fara birou permanent
+        //table:eq(3) > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr
 
-        for (int elementIndex=0; elementIndex<elements.size(); elementIndex++)
+        //regular
+
+        elements=doc.select("table:eq("+foundPartyElementIndex+") > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr");//> tr > td:eq(2) > p:eq(3) > table  > tr > td > p:eq(2) > table > tr:eq(2) > td:eq(2) > table");
+        if (foundPartyElementIndex>-1) {
+            for (int elementIndex = 0; elementIndex < elements.size(); elementIndex++) {
+                String partyString = elements.get(elementIndex).text();
+                String[] partyParts = partyString.split("[\\n*\\s*\\t*]+" + "-" + "[\\n*\\s*\\t*]+");
+                String partyInitials = partyParts[0].trim().replaceAll("[\\n*\\t*\\n*\\r*\\n*]+", "").replaceAll("\u00A0", "").trim().toUpperCase();
+
+                //TODO: replace this workaround with something smarter
+                if (partyInitials.contains("INDEPENDENT"))
+                    partyInitials = "INDEPENDENT";
+
+                person.setCurrentParty(partyInitials);
+                person.getAllPartyList().add(partyInitials);
+            }
+        }
+        else
         {
-            String partyString=elements.get(elementIndex).text();
-            String[] partyParts=partyString.split("[\\n*\\s*\\t*]+" + "-" + "[\\n*\\s*\\t*]+");
-            String partyInitials=partyParts[0].trim().replaceAll("[\\n*\\t*\\n*\\r*\\n*]+", "").replaceAll("\u00A0", "").trim().toUpperCase();
-
-            //TODO: replace this workaround with something smarter
-            if (partyInitials.contains("INDEPENDENT"))
-                partyInitials="INDEPENDENT";
-
-            person.setCurrentParty(partyInitials);
-            person.getAllPartyList().add(partyInitials);
+            person.setCurrentParty("NECUNOSCUT");
+            person.getAllPartyList().add("NECUNOSCUT");
+            logger.severe("Cannot parser party for member "+person.getPersonId());
         }
 
         elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1) > table > tbody ");
