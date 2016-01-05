@@ -41,7 +41,7 @@ public class PersonTests
      */
     public void testApp() throws IOException, InterruptedException {
 
-        for (Long personId=128L; personId<=128L; personId++) {
+        for (Long personId=85L; personId<=85L; personId++) {
 
             DeputyPresenceParser pp = new DeputyPresenceParser();
             Counties counties=new Counties();

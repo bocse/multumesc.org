@@ -300,23 +300,27 @@ public class DeputyPresenceParser {
             person.setPictureURL("http://www.cdep.ro"+elements.get(0).attr("href"));
         else
             person.setPictureURL("");
+        elements=doc.select("a");
+        for (int emailIndex=0; emailIndex<elements.size(); emailIndex++)
+        {
+            String text=elements.get(emailIndex).text();
+            if (text.contains("@") && !text.contains("webmaster"))
+                person.setEmail(text.trim());
+        }
 
         int foundPartyElementIndex=-1;
         for (int partyElementIndex=5; partyElementIndex>=3; partyElementIndex-=2) {
             elements = doc.select("table:eq("+partyElementIndex+") ");
-            if (elements.text().contains("Formaţiunea politică"))
+            if (elements.text().contains("Formaţiunea politică") || elements.text().contains("Organizaţia minorităţilor naţionale"))
             {
                 foundPartyElementIndex=partyElementIndex;
                 break;
             }
         }
-        //Fara birou permanent
-        //table:eq(3) > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr
 
-        //regular
 
-        elements=doc.select("table:eq("+foundPartyElementIndex+") > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr");//> tr > td:eq(2) > p:eq(3) > table  > tr > td > p:eq(2) > table > tr:eq(2) > td:eq(2) > table");
         if (foundPartyElementIndex>-1) {
+            elements=doc.select("table:eq("+foundPartyElementIndex+") > tbody > tr:eq(1) > td:eq(1) > table > tbody > tr");//> tr > td:eq(2) > p:eq(3) > table  > tr > td > p:eq(2) > table > tr:eq(2) > td:eq(2) > table");
             for (int elementIndex = 0; elementIndex < elements.size(); elementIndex++) {
                 String partyString = elements.get(elementIndex).text();
                 String[] partyParts = partyString.split("[\\n*\\s*\\t*]+" + "-" + "[\\n*\\s*\\t*]+");

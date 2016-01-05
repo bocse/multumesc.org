@@ -78,6 +78,7 @@ public class FTPUploader
     public boolean uploadFile(final File localFile) throws IOException {
         return this.uploadFile("/data/" + localFile.getName(), localFile);
     }
+
     public synchronized boolean uploadFile(final String remotePath, final File localFile) throws IOException {
         if(!ftp.isConnected()) {
             this.init();

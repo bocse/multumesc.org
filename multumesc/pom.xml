@@ -88,6 +88,12 @@
             <version>2.4.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk</artifactId>
+            <version>1.10.44</version>
+        </dependency>
+
     </dependencies>
     <build>
     <plugins>

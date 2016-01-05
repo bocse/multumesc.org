@@ -9,9 +9,11 @@ import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
 import com.bocse.multumesc.statistics.StatsProcessor;
 import com.bocse.multumesc.uploader.FTPUploader;
+import com.bocse.multumesc.uploader.S3Uploader;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.lang.time.StopWatch;
 import org.joda.time.DateTime;
 
 import java.io.File;
@@ -38,9 +40,11 @@ public class DeputyCrawler {
     public Long maxPerson;
     public Long firstPerson;
     public Integer threadNumber;
-    public final static String fileSuffix=".txt";
+    public final static String fileSuffix=".json";
     public FTPUploader ftp;
+    public S3Uploader s3;
 
+    public DateTime lastUpdated;
     public DeputyCrawler(String configFile, String stateFile) {
         this.configFile = configFile;
         this.stateFile = stateFile;
@@ -75,11 +79,18 @@ public class DeputyCrawler {
                     configuration.getString("upload.ftp.username"),
                     configuration.getString("upload.ftp.password"));
             ftp.init();
-
         }
+        if (configuration.getBoolean("upload.s3.enabled",false))
+        {
+            s3=new S3Uploader(configFile, configuration.getString("upload.s3.bucket"));
+            //s3.upload("/data/testFile", new File("/home/bocse/testFile.txt" ));
+        }
+        lastUpdated=new DateTime();
     }
 
     public void crawl() throws IOException, InterruptedException, ConfigurationException {
+        StopWatch crawlStopWatch=new StopWatch();
+        crawlStopWatch.start();
         ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
         List<Future<Person>> futureList = Collections.synchronizedList(new ArrayList<Future<Person>>());
         for (Long personIdIndex = firstPerson; personIdIndex <= maxPerson; personIdIndex++) {
@@ -131,6 +142,7 @@ public class DeputyCrawler {
                             //Compute party - version 1
                             List<Person> personWrapper = new ArrayList<>();
                             personWrapper.add(person);
+
                             Map<Integer, Map<String, Map<VoteTypes, AtomicLong>>> partyResults = new HashMap<>();
                             partyResults.put(30, stats.processPartyFromPerson(partyVotes, personWrapper, 30));
                             partyResults.put(90, stats.processPartyFromPerson(partyVotes, personWrapper, 90));
@@ -172,17 +184,31 @@ public class DeputyCrawler {
             } catch (ExecutionException exex) {
                 exceptionsFound++;
                 logger.warning(exex.getCause().toString());
+                exex.printStackTrace();
+
             }
         }
-
-        if (exceptionsFound > 0L)
+        Boolean succesful=false;
+        if (exceptionsFound > 0L) {
             logger.warning("Data may be corrupted. " + exceptionsFound + " found during execution.");
-        else
+            succesful=false;
+        }
+        else {
             logger.info("No exceptions during execution.");
+            succesful=true;
+        }
         for (Person p : persons.values()) {
             p.setVoteMap(null);
         }
-        File profileStatsTogetherFile=JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, persons);
+        crawlStopWatch.stop();
+        Map<String, Object> profileStatsTogetherWrapper=new HashMap<>();
+        profileStatsTogetherWrapper.put("lastUpdateTimestamp", lastUpdated.getMillis());
+        profileStatsTogetherWrapper.put("lastUpdateDateTime", lastUpdated.toString());
+        profileStatsTogetherWrapper.put("crawlTime", crawlStopWatch.getTime());
+        profileStatsTogetherWrapper.put("successful", succesful);
+        profileStatsTogetherWrapper.put("errorCount", exceptionsFound);
+        profileStatsTogetherWrapper.put("payload", persons);
+        File profileStatsTogetherFile=JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, profileStatsTogetherWrapper);
         File partyStatsFile1=new File(configuration.getString("output.partyStats.path")+"_1"+fileSuffix);
         File partyStatsFile2=new File(configuration.getString("output.partyStats.path")+"_1"+fileSuffix);
         File subjectFile=new File(configuration.getString("output.subject.path")+fileSuffix);
@@ -193,7 +219,13 @@ public class DeputyCrawler {
             ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+partyStatsFile2.getName(), partyStatsFile2);
             ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+subjectFile.getName(), subjectFile);
         }
+        if (configuration.getBoolean("upload.s3.enabled", false)) {
+            s3.upload( configuration.getString("upload.s3.remotePath")+profileStatsTogetherFile.getName(),profileStatsTogetherFile);
+            s3.upload(configuration.getString("upload.s3.remotePath") + partyStatsFile1.getName(), partyStatsFile1);
+            s3.upload(configuration.getString("upload.s3.remotePath") + partyStatsFile2.getName(), partyStatsFile2);
+            s3.upload(configuration.getString("upload.s3.remotePath") + subjectFile.getName(), subjectFile);
 
+        }
 
         if (configuration.getBoolean("upload.ftp.enabled", false))
         {

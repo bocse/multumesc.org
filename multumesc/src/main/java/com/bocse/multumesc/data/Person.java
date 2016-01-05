@@ -14,6 +14,7 @@ public class Person  {
     private String lastName;
     private String pictureURL;
     private String currentParty;
+    private String email;
     private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
 
@@ -199,5 +200,13 @@ public class Person  {
 
     public void setAttendancePerWeekExcludingVacation(List<Double> attendancePerWeekExcludingVacation) {
         this.attendancePerWeekExcludingVacation = attendancePerWeekExcludingVacation;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

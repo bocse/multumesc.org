@@ -105,7 +105,7 @@
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered dt-responsive nowrap" cellspacing="0" width="100%" id="dataTables-example">
+                                <table class="table table-striped table-bordered dt-responsive" cellspacing="0" width="100%" id="dataTables-example">
                                     <thead>
                                         <tr>
                                             <th>Nume</th>
@@ -211,20 +211,24 @@
             $('#deputyDetailsTitle').text(item.fullName);
             $('#currentParty').text(item.currentParty);
             $('#partyHistory').text(item.allPartyList);
-            $('#contactInfo').text(item.contactInformation);
-            $('#county').text(item.county);
+            var hasContactInfo=item.contactInformation.indexOf("Luări de cuvânt")==-1;
+            if (hasContactInfo)
+                $('#contactInfo').text(item.contactInformation);
+            else
+                $('#contactInfo').text("Nu sunt disponibile");
+            $('#county').text(capitalizeFirstLetter(item.county));
             $('#colegiu').text(item.colegiu);
             var absence30=Math.round(10.0*100.0*item.statsLast30Days.ABSENT.value / (item.statsLast30Days.TOTAL.value+epsilon))/10.0;
             var absence90=Math.round(10.0*100.0*item.statsLast90Days.ABSENT.value / (item.statsLast90Days.TOTAL.value+epsilon))/10.0;
             var absence365=Math.round(10.0*100.0*item.statsLast365Days.ABSENT.value / (item.statsLast365Days.TOTAL.value+epsilon))/10.0;
             var absenceAllTerm=Math.round(10.0*100.0*item.statsAllTerm.ABSENT.value / (item.statsAllTerm.TOTAL.value+epsilon))/10.0;
-            $('#absence30').text(absence30);
+            $('#absence30').text(absence30+"%");
             $('#absence30').css("color", ' rgb('+Math.round(absence30*maxRed/100.0)+', 0, '+Math.round((1.0-absence30/100.0)*maxBlue)+')');
-            $('#absence90').text(absence90);
+            $('#absence90').text(absence90+"%");
             $('#absence90').css("color", ' rgb('+Math.round(absence90*maxRed/100.0)+', 0, '+Math.round((1.0-absence90/100.0)*maxBlue)+')');
-            $('#absence365').text(absence365);
+            $('#absence365').text(absence365+"%");
             $('#absence365').css("color", ' rgb('+Math.round(absence365*maxRed/100.0)+', 0, '+Math.round((1.0-absence365/100.0)*maxBlue)+')');
-            $('#absenceAllTerm').text(absenceAllTerm);
+            $('#absenceAllTerm').text(absenceAllTerm+"%");
             $('#absenceAllTerm').css("color", ' rgb('+Math.round(absenceAllTerm*maxRed/100.0)+', 0, '+Math.round((1.0-absenceAllTerm/100.0)*maxBlue)+')');
             $('#profileLink').attr("href", "http://www.cameradeputatilor.ro/pls/parlam/structura2015.mp?idm="+loadedData[nume].personId+"&cam=2&leg=2012");
             $('#deputyDetailsTab').fadeIn(500);
@@ -371,9 +375,9 @@
                 console.error(thrownError);
             },
             success: function (res) {
-                loadedData=res;
+                loadedData=res.payload;
                 //alert("Loaded "+res.length);
-                prepareData(res);
+                prepareData(loadedData);
                 renderTable();
                 $('body').on('click', '.deputyDetailsLink', function () {
                 //$('.classDetailsLink').click(function(event) {
