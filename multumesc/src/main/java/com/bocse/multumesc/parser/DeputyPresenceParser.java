@@ -344,7 +344,10 @@ public class DeputyPresenceParser {
         elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1) > table > tbody ");
 
         person.setContactInformation(elements.get(elements.size()-1).text());
-
+        if (person.getContactInformation().contains("Luări de cuvânt"))
+        {
+            person.setContactInformation("");
+        }
         elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1)");
         //ales deputat în circumscripţia electorală nr.22 HUNEDOARA, colegiul uninominal nr.3 data încetarii mandatului: 29 aprilie 2013 - înlocuit de: Petru-Sorin Marica
         String presentationText=elements.get(0).text().toLowerCase();

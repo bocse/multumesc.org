@@ -156,7 +156,8 @@
                             <p>Rată de absenteism în ultimele 90 zile: <label id="absence90"></label></p>
                             <p>Rată de absenteism în ultimele 365 zile: <label id="absence365"></label></p>
                             <p>Rată de absenteism de la începutul legislaturii: <label id="absenceAllTerm"></label></p>
-                            <p>Date de contact: <label id="contactInfo"></label></p>
+                            <p>Email: <label id="emailInfo"></label></p>
+                            <p>Alte date de contact: <label id="contactInfo"></label></p>
                             <p><a href="#" id="profileLink" target="_blank">Profilul deputatului de pe site-ul cdep.ro</a></p>
                             <div class="flot-chart">
                                 <div class="flot-chart-content" id="flot-line-chart"></div>
@@ -211,11 +212,15 @@
             $('#deputyDetailsTitle').text(item.fullName);
             $('#currentParty').text(item.currentParty);
             $('#partyHistory').text(item.allPartyList);
-            var hasContactInfo=item.contactInformation.indexOf("Luări de cuvânt")==-1;
+            var hasContactInfo=(item.contactInformation.length>1) && (item.contactInformation.indexOf("Luări de cuvânt")==-1);
             if (hasContactInfo)
                 $('#contactInfo').text(item.contactInformation);
             else
-                $('#contactInfo').text("Nu sunt disponibile");
+                $('#contactInfo').text("nu sunt disponibile");
+            if (item.email)
+                $('#emailInfo').html('<a href="mailto:'+item.email+'">'+item.email+'</a>');
+            else
+                $('#emailInfo').text("nu e disponibilă");
             $('#county').text(capitalizeFirstLetter(item.county));
             $('#colegiu').text(item.colegiu);
             var absence30=Math.round(10.0*100.0*item.statsLast30Days.ABSENT.value / (item.statsLast30Days.TOTAL.value+epsilon))/10.0;
