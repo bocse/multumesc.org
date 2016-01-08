@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Prezența la zi a deputaților României">
-    <meta name="author" content="Bogdan Bocșe">
+    <meta name="author" content="B.B.">
 
     <title>Multumesc.org - Prezența la zi a deputaților României</title>
 
@@ -46,331 +46,372 @@
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
 </head>
 
 <body>
 <div id="fb-root"></div>
-<script>(function(d, s, id) {
+<script>(function (d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0];
     if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
+    js = d.createElement(s);
+    js.id = id;
     js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5";
     fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));</script>
 
-    <div id="wrapper">
+<div id="wrapper">
 
-        <!-- Navigation -->
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="/">Mulțumesc.org - Prezența la zi a deputaților României</a>
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">Mulțumesc.org - Prezența la zi a deputaților României</a>
+        </div>
+        <!-- /.navbar-header -->
+
+        <ul class=" navbar-right">
+            <a class="btn btn-lg btn-danger" href="/despre.html">Despre Mulțumesc.org</a>
+            <a class="btn btn-lg btn-warning" href="/sustine.html">Implică-te, susține Mulțumesc.org</a>
+            <a class="btn btn-lg btn-primary" href="/contact.html">Scrie-ne</a>
+
+        </ul>
+        <!-- /.navbar-top-links -->
+
+
+    </nav>
+
+    <div id="page-wrapper">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Statistici de prezență pentru Camera Deputațior</h1>
             </div>
-            <!-- /.navbar-header -->
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Rata de prezență individuală a membrilor Camerei Deputaților
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <div class="dataTable_wrapper">
+                            <table class="table table-striped table-bordered" cellspacing="0" width="100%"
+                                   id="dataTables-example">
+                                <thead>
+                                <tr>
+                                    <th>Nume</th>
+                                    <th>Partid</th>
+                                    <th>Județ</th>
+                                    <th>Colegiu</th>
+                                    <th>Prezență 30 zile</th>
+                                    <th>Prezență 90 zile</th>
+                                    <th>Prezență 365 zile</th>
+                                    <th>Prezență mandat</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr class="odd">
+                                    <td>Se încarcă informațiile de prezență despre deputați ...</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <p> Ultima actualizare: <label id="lastUpdateDateTime"></label></p>
 
-            <ul class=" navbar-right">
-                <a class="btn btn-lg btn-danger" href="/despre.html">Despre Mulțumesc.org</a>
-                <a class="btn btn-lg btn-warning" href="/sustine.html">Implică-te, susține Mulțumesc.org</a>
-                <a class="btn btn-lg btn-primary" href="/contact.html">Scrie-ne</a>
-
-            </ul>
-            <!-- /.navbar-top-links -->
-
-
-        </nav>
-
-        <div id="page-wrapper">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">Statistici de prezență pentru Camera Deputațior</h1>
+                        <p><i>* Deputații care nu mai sunt în funcție nu se găsesc pe listă.</i></p>
+                    </div>
+                    <!-- /.panel-body -->
                 </div>
-                <!-- /.col-lg-12 -->
+                <!-- /.panel -->
             </div>
-            <!-- /.row -->
-            <div class="row">
+            <!-- /.col-lg-12 -->
+        </div>
+        <!-- /.row -->
+        <div class="row" style="display: none;" id="deputyDetailsTab">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Detalii despre deputat <label id="deputyDetailsTitle"></label>
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <div class="pull-right">
+                            <a class="profileLink" target="_blank" href="#"><img id="big-picture"
+                                                                                 src="http://www.cdep.ro/parlamentari/l2012/Udrea-Elena-Gabriela.jpg"/></a>
+                        </div>
+                        <p>Partid: <label id="currentParty"></label></p>
+
+                        <p>Istoric partide: <label id="partyHistory"></label></p>
+
+                        <p>Județ: <label id="county"></label> Colegiu: <label id="colegiu"></label></p>
+
+                        <p>Absenteism în ultimele 30 zile calendaristice: <label id="absence30"></label></p>
+
+                        <p>Absenteism în ultimele 90 zile calendaristice: <label id="absence90"></label></p>
+
+                        <p>Absenteism în ultimele 365 zile calendaristice: <label id="absence365"></label></p>
+
+                        <p>Absenteism de la începutul legislaturii: <label id="absenceAllTerm"></label></p>
+
+                        <p>Email: <label id="emailInfo"></label></p>
+
+                        <p>Alte date de contact: <label id="contactInfo"></label></p>
+
+                        <p><a href="#" class="profileLink" target="_blank">Profilul deputatului de pe site-ul
+                            cdep.ro</a></p>
+
+                        <div class="flot-chart">
+                            <div class="flot-chart-content" id="flot-line-chart"></div>
+                            <p><i>* Săptămânile în care Camera Deputaților nu a avut activitate de plen NU sunt
+                                reprezentate pe grafic și NU se consideră absență.</i></p>
+                            <p>
+                            <a class="btn btn-default pull-right" href="#">Înapoi la căutare în lista cu deputați</a>
+                            </p>
+                        </div>
+
+                    </div>
+                    <!-- /.panel-body -->
+                </div>
+                <!-- /.panel -->
+            </div>
+</div>
+            <div class="row" >
                 <div class="col-lg-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Rata de prezență individuală a membrilor Camerei Deputaților
+                            Descărcați datele
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
-                            <div class="dataTable_wrapper">
-                                <table class="table table-striped table-bordered" cellspacing="0" width="100%" id="dataTables-example">
-                                    <thead>
-                                        <tr>
-                                            <th>Nume</th>
-                                            <th>Partid</th>
-                                            <th>Județ</th>
-                                            <th>Colegiu</th>
-                                            <th>Prezență 30 zile</th>
-                                            <th>Prezență 90 zile</th>
-                                            <th>Prezență 365 zile</th>
-                                            <th>Prezență mandat</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr class="odd">
-                                            <td>Se încarcă informațiile de prezență despre deputați ...</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <p> Ultima actualizare: <label id="lastUpdateDateTime"></label></p>
+                            <p>Datele pe baza cărora este generată această pagină sunt disponibile pentru a fi descărcate, în format JSON:</p>
+                            <p><a href="/data/personStatsTogether.json" download="">Date individuale despre deputați</a></p>
+                            <p><a href="/data/partyStats_1.json" download="">Date agregate pe partide/formațiuni politice</a></p>
                         </div>
-                        <!-- /.panel-body -->
                     </div>
-                    <!-- /.panel -->
-                </div>
-                <!-- /.col-lg-12 -->
-            </div>
-            <!-- /.row -->
-            <div class="row" style="display: none;" id="deputyDetailsTab">
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" >
-                            Detalii despre deputat <label id="deputyDetailsTitle"></label>
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <p>Partid: <label id="currentParty"></label></p>
-                            <p>Istoric partide: <label id="partyHistory"></label></p>
-                            <p>Județ: <label id="county"></label> Colegiu: <label id="colegiu"></label></p>
-                            <p>Rată de absenteism în ultimele 30 zile: <label id="absence30"></label></p>
-                            <p>Rată de absenteism în ultimele 90 zile: <label id="absence90"></label></p>
-                            <p>Rată de absenteism în ultimele 365 zile: <label id="absence365"></label></p>
-                            <p>Rată de absenteism de la începutul legislaturii: <label id="absenceAllTerm"></label></p>
-                            <p>Email: <label id="emailInfo"></label></p>
-                            <p>Alte date de contact: <label id="contactInfo"></label></p>
-                            <p><a href="#" id="profileLink" target="_blank">Profilul deputatului de pe site-ul cdep.ro</a></p>
-                            <div class="flot-chart">
-                                <div class="flot-chart-content" id="flot-line-chart"></div>
-                                <p><i>*Săptămânile în care Camera Deputaților nu a avut activitate nu sunt reprezentate pe grafic.</i></p>
-                            </div>
-                        </div>
-                        <!-- /.panel-body -->
-                    </div>
-                    <!-- /.panel -->
                 </div>
 
-            </div>
-            <div class="fb-comments" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
-        </div>
-        <!-- /#page-wrapper -->
-
+        <div class="fb-comments" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
     </div>
-    <!-- /#wrapper -->
+    <!-- /#page-wrapper -->
+
+</div>
+<!-- /#wrapper -->
 
 
-    <!-- DataTables JavaScript -->
-    <!--<script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>-->
-    <!--<script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>-->
+<!-- DataTables JavaScript -->
+<!--<script src="../bower_components/datatables/media/js/jquery.dataTables.min.js"></script>-->
+<!--<script src="../bower_components/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap.min.js"></script>-->
 
 
-    <!-- Page-Level Demo Scripts - Tables - Use for reference -->
-    <script>
-        var serviceURL='';
-        var loadedData=null;
-        var preparedData=null;
-        var maxRed=200;
-        var maxBlue=180;
-        var epsilon=0.00001;
-        var lastUpdateTimestamp=null;
-        var crawlTime=null;
-        var errorCount=null;
-        var succesful=null;
-/*
-    $(document).ready(function() {
-        $('#dataTables-example').DataTable({
-                responsive: true,
-				ajax: '../data/personStatsTogether.json'
-        });
-    });
-*/
+<!-- Page-Level Demo Scripts - Tables - Use for reference -->
+<script>
+    var serviceURL = '';
+    var loadedIndividualData = null;
+    var loadedPartyData = null;
+    var preparedIndividualData = null;
+    var preparedPartyData = null;
+    var maxRed = 200;
+    var maxBlue = 180;
+    var epsilon = 0.00001;
+    var lastUpdateDate = null;
+    var lastUpdateTimestamp = null;
+    var crawlTime = null;
+    var errorCount = null;
+    var succesful = null;
+    /*
+     $(document).ready(function() {
+     $('#dataTables-example').DataTable({
+     responsive: true,
+     ajax: '../data/personStatsTogether.json'
+     });
+     });
+     */
 
 
-//        <p>Județ: <label id="county"></label> Colegiu: <label id="colegiu"></label></p>
-//        <p>Rată de absenteism în ultimele 30 zile: <label id="absence30"></label></p>
-//        <p>Rată de absenteism în ultimele 90 zile: <label id="absence90"></label></p>
-//        <p>Rată de absenteism în ultimele 365 zile: <label id="absence365"></label></p>
-//        <p>Rată de absenteism de la începutul legislaturii: <label id="absenceAllTerm"></label></p>
+    //        <p>Județ: <label id="county"></label> Colegiu: <label id="colegiu"></label></p>
+    //        <p>Rată de absenteism în ultimele 30 zile: <label id="absence30"></label></p>
+    //        <p>Rată de absenteism în ultimele 90 zile: <label id="absence90"></label></p>
+    //        <p>Rată de absenteism în ultimele 365 zile: <label id="absence365"></label></p>
+    //        <p>Rată de absenteism de la începutul legislaturii: <label id="absenceAllTerm"></label></p>
 
-        function profileData(nume) {
-            var item=loadedData[nume];
-            $('#deputyDetailsTitle').text(item.fullName);
-            $('#currentParty').text(item.currentParty);
-            $('#partyHistory').text(item.allPartyList);
-            var hasContactInfo=(item.contactInformation.length>1) && (item.contactInformation.indexOf("Luări de cuvânt")==-1);
-            if (hasContactInfo)
-                $('#contactInfo').text(item.contactInformation);
-            else
-                $('#contactInfo').text("nu sunt disponibile");
-            if (item.email)
-                $('#emailInfo').html('<a href="mailto:'+item.email+'">'+item.email+'</a>');
-            else
-                $('#emailInfo').text("nu e disponibilă");
-            $('#county').text(capitalizeFirstLetter(item.county));
-            $('#colegiu').text(item.colegiu);
-            var absence30=Math.round(10.0*100.0*item.statsLast30Days.ABSENT.value / (item.statsLast30Days.TOTAL.value+epsilon))/10.0;
-            var absence90=Math.round(10.0*100.0*item.statsLast90Days.ABSENT.value / (item.statsLast90Days.TOTAL.value+epsilon))/10.0;
-            var absence365=Math.round(10.0*100.0*item.statsLast365Days.ABSENT.value / (item.statsLast365Days.TOTAL.value+epsilon))/10.0;
-            var absenceAllTerm=Math.round(10.0*100.0*item.statsAllTerm.ABSENT.value / (item.statsAllTerm.TOTAL.value+epsilon))/10.0;
-            $('#absence30').text(absence30+"%");
-            $('#absence30').css("color", ' rgb('+Math.round(absence30*maxRed/100.0)+', 0, '+Math.round((1.0-absence30/100.0)*maxBlue)+')');
-            $('#absence90').text(absence90+"%");
-            $('#absence90').css("color", ' rgb('+Math.round(absence90*maxRed/100.0)+', 0, '+Math.round((1.0-absence90/100.0)*maxBlue)+')');
-            $('#absence365').text(absence365+"%");
-            $('#absence365').css("color", ' rgb('+Math.round(absence365*maxRed/100.0)+', 0, '+Math.round((1.0-absence365/100.0)*maxBlue)+')');
-            $('#absenceAllTerm').text(absenceAllTerm+"%");
-            $('#absenceAllTerm').css("color", ' rgb('+Math.round(absenceAllTerm*maxRed/100.0)+', 0, '+Math.round((1.0-absenceAllTerm/100.0)*maxBlue)+')');
-            $('#profileLink').attr("href", "http://www.cdep.ro/pls/parlam/structura2015.mp?idm="+loadedData[nume].personId+"&cam=2&leg=2012");
-            $('#deputyDetailsTab').fadeIn(500);
-        }
-        function plot(nume) {
-            var absenceRate = [];
-            var offset=0;
+    function profileData(nume) {
+        var item = loadedIndividualData[nume];
+        var smallPictureURL = item.pictureURL.replace("/mari", "");
+        $('#big-picture').attr("src", smallPictureURL);
+
+        $('#deputyDetailsTitle').text(item.fullName);
+        $('#currentParty').text(item.currentParty);
+        $('#partyHistory').text(item.allPartyList);
+        var hasContactInfo = (item.contactInformation.length > 1) && (item.contactInformation.indexOf("Luări de cuvânt") == -1);
+        if (hasContactInfo)
+            $('#contactInfo').text(item.contactInformation);
+        else
+            $('#contactInfo').text("nu sunt disponibile");
+        if (item.email)
+            $('#emailInfo').html('<a href="mailto:' + item.email + '">' + item.email + '</a>');
+        else
+            $('#emailInfo').text("nu e disponibilă");
+        $('#county').text(capitalizeFirstLetter(item.county));
+        $('#colegiu').text(item.colegiu);
+        var absence30 = Math.round(10.0 * 100.0 * item.statsLast30Days.ABSENT.value / (item.statsLast30Days.TOTAL.value + epsilon)) / 10.0;
+        var absence90 = Math.round(10.0 * 100.0 * item.statsLast90Days.ABSENT.value / (item.statsLast90Days.TOTAL.value + epsilon)) / 10.0;
+        var absence365 = Math.round(10.0 * 100.0 * item.statsLast365Days.ABSENT.value / (item.statsLast365Days.TOTAL.value + epsilon)) / 10.0;
+        var absenceAllTerm = Math.round(10.0 * 100.0 * item.statsAllTerm.ABSENT.value / (item.statsAllTerm.TOTAL.value + epsilon)) / 10.0;
+        $('#absence30').text(absence30 + "%");
+        $('#absence30').css("color", ' rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')');
+        $('#absence90').text(absence90 + "%");
+        $('#absence90').css("color", ' rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')');
+        $('#absence365').text(absence365 + "%");
+        $('#absence365').css("color", ' rgb(' + Math.round(absence365 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence365 / 100.0) * maxBlue) + ')');
+        $('#absenceAllTerm').text(absenceAllTerm + "%");
+        $('#absenceAllTerm').css("color", ' rgb(' + Math.round(absenceAllTerm * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absenceAllTerm / 100.0) * maxBlue) + ')');
+        $('.profileLink').attr("href", "http://www.cdep.ro/pls/parlam/structura2015.mp?idm=" + loadedIndividualData[nume].personId + "&cam=2&leg=2012");
+        $('#deputyDetailsTab').fadeIn(500);
+    }
+    function plot(nume) {
+        var absenceRate = [];
+        var offset = 0;
 //            for (var i = 0; i < 12; i += 0.2) {
 //                presenceRate.push([i, Math.sin(i + offset)]);
 //
 //            }
-            for (var i=0; i<loadedData[nume].attendancePerWeekExcludingVacation.length; i++)
-            {
-                absenceRate.push([i, 100.0-loadedData[nume].attendancePerWeekExcludingVacation[i]])
+        for (var i = 0; i < loadedIndividualData[nume].attendancePerWeekExcludingVacation.length; i++) {
+            absenceRate.push([i, 100.0 - loadedIndividualData[nume].attendancePerWeekExcludingVacation[i]])
+        }
+
+        var options = {
+            series: {
+                lines: {show: true, fill: true}
+                ,
+                points: {
+                    show: true
+                }
+            },
+            grid: {
+                hoverable: true //IMPORTANT! this is needed for tooltip to work
+            },
+            yaxis: {
+                min: 0.0,
+                max: 109.0
+            },
+            tooltip: true,
+            tooltipOpts: {
+                content: "%s <br/> în săptămâna %x.0 de la începutul legislaturii  este de %y.1 %",
+                shifts: {
+                    x: -60,
+                    y: 25
+                }
             }
+        };
 
-            var options = {
-                series: {
-                    lines: { show: true, fill: true }
-                    ,
-                    points: {
-                        show: true
-                    }
+        var plotObj = $.plot($("#flot-line-chart"), [{
+                    data: absenceRate,
+                    label: "Rata de absență a deputatului " + nume,
+                    color: "#AF0101"
+                }],
+                options);
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function renderTable() {
+        $('#dataTables-example').DataTable({
+            data: preparedIndividualData,
+            "language": {
+                "decimal": "",
+                "emptyTable": "Nu există informații corespunzătoare de afișat.",
+                "info": "Se afișează înregistrările de la _START_ la _END_ din _TOTAL_ înregistrări.",
+                "infoEmpty": "Nu există înregistrări care să corespundă căutării.",
+                "infoFiltered": "(selectate dintr-un total de _MAX_ înregistrări)",
+                "infoPostFix": "",
+                "thousands": ",",
+                "lengthMenu": "Arată _MENU_ dintre înregistrări pe pagină",
+                "loadingRecords": "Se încarcă...",
+                "processing": "Se procesează...",
+                "search": "<b>Căutare</b> (nume, județ, partid):",
+                "zeroRecords": "Nu s-au găsit înregistrări care să corespundă căutării.",
+                "paginate": {
+                    "first": "Prima",
+                    "last": "Ultima",
+                    "next": "Următoarea",
+                    "previous": "Precedenta"
                 },
-                grid: {
-                    hoverable: true //IMPORTANT! this is needed for tooltip to work
-                },
-                yaxis: {
-                    min: 0.0,
-                    max: 109.0
-                },
-                tooltip: true,
-                tooltipOpts: {
-                    content: "%s <br/> în săptămâna %x.0 de la începutul legislaturii  este de %y.1 %",
-                    shifts: {
-                        x: -60,
-                        y: 25
-                    }
+                "aria": {
+                    "sortAscending": ": sortare crescătoare",
+                    "sortDescending": ": sortare descrescătoare"
                 }
-            };
+            },
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Toate"]],
+            "autoWidth": true,
+            columns: [
+                {title: "Nume"},
+                {title: "Partid"},
+                {title: "Județ"},
+                {title: "Colegiu"},
+                {title: "Absențe în ultimele 30 zile"},
+                {title: "Absență în ultimele 90 zile"},
+                {title: "Absență în ultimele 365 zile"},
+                {title: "Absență per mandat"}
+            ],
+            stateSave: true,
+            iDisplayLength: 10,
+            stateDuration: 43200,
+            "order": [[4, "desc"]]
+        });
+    }
 
-            var plotObj = $.plot($("#flot-line-chart"), [{
-                        data: absenceRate,
-                        label: "Rata de absență a deputatului "+nume,
-                        color:"#AF0101"
-                    }],
-                    options);
-        }
+    function prepareData(res) {
+        preparedIndividualData = [];
+        $.each(res, function (key, item) {
+            //console.info(item.fullName);
 
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
+            if (item.active) {
+                var localCandidate = [];
+                var smallPictureURL = item.pictureURL.replace("/mari", "");
+                localCandidate.push('<a href="#deputyDetailsTab" class="deputyDetailsLink" deputyName="' + item.fullName + '">' + '<img src="' + smallPictureURL + '" width="48" height="64" class="deputyDetailsLink"  deputyName="' + item.fullName + '"/>' + item.fullName + '</a>');
+                localCandidate.push(item.currentParty);
+                localCandidate.push(capitalizeFirstLetter(item.county));
+                if (item.colegiu != -1)
+                    localCandidate.push(item.colegiu);
+                else
+                    localCandidate.push("-");
+                var absence30 = Math.round(10.0 * 100.0 * item.statsLast30Days.ABSENT.value / item.statsLast30Days.TOTAL.value) / 10.0;
+                localCandidate.push('<span style="color: rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')">' + absence30 + '%</span>');
 
-        function renderTable() {
-            $('#dataTables-example').DataTable({
-                data: preparedData,
-                "language": {
-                    "decimal":        "",
-                    "emptyTable":     "Nu există informații corespunzătoare de afișat.",
-                    "info":           "Se afișează înregistrările de la _START_ la _END_ din _TOTAL_ înregistrări.",
-                    "infoEmpty":      "Nu există înregistrări care să corespundă căutării.",
-                    "infoFiltered":   "(selectate dintr-un total de _MAX_ înregistrări)",
-                    "infoPostFix":    "",
-                    "thousands":      ",",
-                    "lengthMenu":     "Arată _MENU_ dintre înregistrări pe pagină",
-                    "loadingRecords": "Se încarcă...",
-                    "processing":     "Se procesează...",
-                    "search":         "<b>Căutare</b> (nume, județ, partid):",
-                    "zeroRecords":    "Nu s-au găsit înregistrări care să corespundă căutării.",
-                    "paginate": {
-                        "first":      "Prima",
-                        "last":       "Ultima",
-                        "next":       "Următoarea",
-                        "previous":   "Precedenta"
-                    },
-                    "aria": {
-                        "sortAscending":  ": sortare crescătoare",
-                        "sortDescending": ": sortare descrescătoare"
-                    }
-                },
-                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "Toate"]],
-                "autoWidth": true,
-                columns: [
-                    {title: "Nume"},
-                    {title: "Partid"},
-                    {title: "Județ"},
-                    {title: "Colegiu"},
-                    {title: "Absențe în ultimele 30 zile"},
-                    {title: "Absență în ultimele 90 zile"},
-                    {title: "Absență în ultimele 365 zile"},
-                    {title: "Absență per mandat"}
-                ],
-                stateSave: true,
-                iDisplayLength:25,
-                stateDuration: 43200,
-                "order": [[4, "desc"]]
-            });
-        }
+                var absence90 = Math.round(10.0 * 100.0 * item.statsLast90Days.ABSENT.value / item.statsLast90Days.TOTAL.value) / 10.0;
+                localCandidate.push('<span style="color: rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')">' + absence90 + '%</span>');
 
-        function prepareData(res)
-        {
-            preparedData=[];
-            $.each(res, function (key, item) {
-                //console.info(item.fullName);
+                var absence365 = Math.round(10.0 * 100.0 * item.statsLast365Days.ABSENT.value / item.statsLast365Days.TOTAL.value) / 10.0;
+                localCandidate.push('<span style="color: rgb(' + Math.round(absence365 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence365 / 100.0) * maxBlue) + ')">' + absence365 + '%</span>');
 
-                if (item.active)
-                {
-                    var localCandidate=[];
-                    var smallPictureURL=item.pictureURL.replace("/mari","");
-                    localCandidate.push('<a href="#deputyDetailsTitle" class="deputyDetailsLink" deputyName="'+item.fullName+'">'+'<img src="'+smallPictureURL+'" width="48" height="64" class="deputyDetailsLink"  deputyName="'+item.fullName+'"/>'+item.fullName+'</a>');
-                    localCandidate.push(item.currentParty);
-                    localCandidate.push(capitalizeFirstLetter(item.county));
-                    if (item.colegiu!=-1)
-                        localCandidate.push(item.colegiu);
-                    else
-                        localCandidate.push("-");
-                    var absence30=Math.round(10.0*100.0*item.statsLast30Days.ABSENT.value / item.statsLast30Days.TOTAL.value)/10.0;
-                    localCandidate.push('<span style="color: rgb('+Math.round(absence30*maxRed/100.0)+', 0, '+Math.round((1.0-absence30/100.0)*maxBlue)+')">'+absence30 +'%</span>');
+                var absenceAllTerm = Math.round(10.0 * 100.0 * item.statsAllTerm.ABSENT.value / item.statsAllTerm.TOTAL.value) / 10.0;
+                localCandidate.push('<span style="color: rgb(' + Math.round(absenceAllTerm * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absenceAllTerm / 100.0) * maxBlue) + ')">' + absenceAllTerm + '%</span>');
 
-                    var absence90=Math.round(10.0*100.0*item.statsLast90Days.ABSENT.value / item.statsLast90Days.TOTAL.value)/10.0;
-                    localCandidate.push('<span style="color: rgb('+Math.round(absence90*maxRed/100.0)+', 0, '+Math.round((1.0-absence90/100.0)*maxBlue)+')">'+absence90 +'%</span>');
-
-                    var absence365=Math.round(10.0*100.0*item.statsLast365Days.ABSENT.value / item.statsLast365Days.TOTAL.value)/10.0;
-                    localCandidate.push('<span style="color: rgb('+Math.round(absence365*maxRed/100.0)+', 0, '+Math.round((1.0-absence365/100.0)*maxBlue)+')">'+absence365 +'%</span>');
-
-                    var absenceAllTerm=Math.round(10.0*100.0*item.statsAllTerm.ABSENT.value / item.statsAllTerm.TOTAL.value)/10.0;
-                    localCandidate.push('<span style="color: rgb('+Math.round(absenceAllTerm*maxRed/100.0)+', 0, '+Math.round((1.0-absenceAllTerm/100.0)*maxBlue)+')">'+absenceAllTerm +'%</span>');
-
-                    preparedData.push(localCandidate);
-                }
-            });
-        }
-    $(document).ready(function() {
+                preparedIndividualData.push(localCandidate);
+            }
+        });
+    }
+    $(document).ready(function () {
 
 
         $.ajax({
@@ -384,36 +425,37 @@
                 console.error(thrownError);
             },
             success: function (res) {
-                $('#lastUpdateDateTime').text(res.lastUpdateDateTime);
-                lastUpdateDateTime=res.lastUpdateDateTime;
-                lastUpdateTimestamp=res.lastUpdateTimestamp;
-                crawlTime=res.crawlTime;
-                errorCount=res.errorCount;
-                succesful=res.successful;
-                loadedData=res.payload;
-                console.log("Succesful: "+succesful);
-                console.log("Processing time:"+crawlTime);
-                console.log("Error count: "+errorCount);
-                console.log("Last updated:"+lastUpdateDateTime);
-                console.log("Last update timestamp:"+ lastUpdateTimestamp);
-                console.log("Number of profiles: "+res.payload.length);
+                lastUpdateDate = res.lastUpdateDateTime.substr(0, res.lastUpdateDateTime.indexOf('T'));
+                $('#lastUpdateDateTime').text(lastUpdateDate);
+                lastUpdateDateTime = res.lastUpdateDateTime;
+                lastUpdateTimestamp = res.lastUpdateTimestamp;
+                crawlTime = res.crawlTime;
+                errorCount = res.errorCount;
+                succesful = res.successful;
+                loadedIndividualData = res.payload;
+                console.log("Succesful: " + succesful);
+                console.log("Processing time:" + crawlTime);
+                console.log("Error count: " + errorCount);
+                console.log("Last updated:" + lastUpdateDateTime);
+                console.log("Last update timestamp:" + lastUpdateTimestamp);
+                console.log("Number of profiles: " + res.payload.length);
                 //alert("Loaded "+res.length);
-                prepareData(loadedData);
+                prepareData(loadedIndividualData);
                 renderTable();
                 $('body').on('click', '.deputyDetailsLink', function () {
-                //$('.classDetailsLink').click(function(event) {
-                        var deputyName=event.target.attributes["deputyName"].nodeValue;
-                        plot(deputyName);
-                        profileData(deputyName);
-                        //alert(deputyName.nodeValue);
+                    //$('.classDetailsLink').click(function(event) {
+                    var deputyName = event.target.attributes["deputyName"].nodeValue;
+                    plot(deputyName);
+                    profileData(deputyName);
+                    //alert(deputyName.nodeValue);
 
                 });
                 //plot("Alexandru NAZARE");
             }
         });
 
-    } );
-    </script>
+    });
+</script>
 
 </body>
 
