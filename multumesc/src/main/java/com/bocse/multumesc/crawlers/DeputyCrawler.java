@@ -30,8 +30,11 @@ public class DeputyCrawler {
     private final static Logger logger = Logger.getLogger(MultumescDeputyParallelMain.class.toString());
     public final FileConfiguration configuration = new PropertiesConfiguration();
     public final FileConfiguration state = new PropertiesConfiguration();
-    public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes = new ConcurrentHashMap<>();
-    public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes2 = new ConcurrentHashMap<>();
+    //public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes = new ConcurrentHashMap<>();
+    public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes30 = new ConcurrentHashMap<>();
+    public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes90 = new ConcurrentHashMap<>();
+    public final Map<String, Map<VoteTypes, AtomicLong>> partyVotes365 = new ConcurrentHashMap<>();
+    public final Map<String, Map<VoteTypes, AtomicLong>> partyVotesAll = new ConcurrentHashMap<>();
     public final Map<String, Person> persons = new ConcurrentHashMap<>();
     public final SortedMap<Long, String> subjectMatters = new ConcurrentSkipListMap<>();
     private final String configFile;
@@ -143,20 +146,22 @@ public class DeputyCrawler {
                             List<Person> personWrapper = new ArrayList<>();
                             personWrapper.add(person);
 
+                            /*
                             Map<Integer, Map<String, Map<VoteTypes, AtomicLong>>> partyResults = new HashMap<>();
                             partyResults.put(30, stats.processPartyFromPerson(partyVotes, personWrapper, 30));
                             partyResults.put(90, stats.processPartyFromPerson(partyVotes, personWrapper, 90));
                             partyResults.put(365, stats.processPartyFromPerson(partyVotes, personWrapper, 365));
                             partyResults.put(-1, stats.processPartyFromPerson(partyVotes, personWrapper, -1));
                             JsonSerializer.serialize(configuration.getString("output.partyStats.path")+"_1"+fileSuffix, partyResults);
-
+                            */
                             //Compute party - version 2
+                            Map<Integer, Map<String, Map<VoteTypes, AtomicLong>>> partyResults = new HashMap<>();
                             partyResults = new HashMap<>();
-                            partyResults.put(30, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(30), new DateTime()));
-                            partyResults.put(90, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(90), new DateTime()));
-                            partyResults.put(365, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(365), new DateTime()));
-                            partyResults.put(-1, stats.processPartyFromVotes(partyVotes2, personWrapper, new DateTime().minusDays(9999), new DateTime()));
-                            JsonSerializer.serialize(configuration.getString("output.partyStats.path")+"_2"+fileSuffix, partyResults);
+                            partyResults.put(30, stats.processPartyFromVotes(partyVotes30, personWrapper, new DateTime().minusDays(30), new DateTime()));
+                            partyResults.put(90, stats.processPartyFromVotes(partyVotes90, personWrapper, new DateTime().minusDays(90), new DateTime()));
+                            partyResults.put(365, stats.processPartyFromVotes(partyVotes365, personWrapper, new DateTime().minusDays(365), new DateTime()));
+                            partyResults.put(-1, stats.processPartyFromVotes(partyVotesAll, personWrapper, new DateTime().minusDays(9999), new DateTime()));
+                            JsonSerializer.serialize(configuration.getString("output.partyStats.path")+fileSuffix, partyResults);
                         } else {
                             logger.info("Person " + person.getPersonId() + " is not active, so it will not be added to party " + person.getCurrentParty() + " stats.");
                         }
@@ -209,20 +214,17 @@ public class DeputyCrawler {
         profileStatsTogetherWrapper.put("errorCount", exceptionsFound);
         profileStatsTogetherWrapper.put("payload", persons);
         File profileStatsTogetherFile=JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, profileStatsTogetherWrapper);
-        File partyStatsFile1=new File(configuration.getString("output.partyStats.path")+"_1"+fileSuffix);
-        File partyStatsFile2=new File(configuration.getString("output.partyStats.path")+"_1"+fileSuffix);
+        File partyStatsFile=new File(configuration.getString("output.partyStats.path")+fileSuffix);
         File subjectFile=new File(configuration.getString("output.subject.path")+fileSuffix);
         if (configuration.getBoolean("upload.ftp.enabled", false))
         {
             ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+profileStatsTogetherFile.getName(), profileStatsTogetherFile);
-            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+partyStatsFile1.getName(), partyStatsFile1);
-            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+partyStatsFile2.getName(), partyStatsFile2);
+            ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+partyStatsFile.getName(), partyStatsFile);
             ftp.uploadFileAsync(configuration.getString("upload.ftp.remotePath")+subjectFile.getName(), subjectFile);
         }
         if (configuration.getBoolean("upload.s3.enabled", false)) {
             s3.upload( configuration.getString("upload.s3.remotePath")+profileStatsTogetherFile.getName(),profileStatsTogetherFile);
-            s3.upload(configuration.getString("upload.s3.remotePath") + partyStatsFile1.getName(), partyStatsFile1);
-            s3.upload(configuration.getString("upload.s3.remotePath") + partyStatsFile2.getName(), partyStatsFile2);
+            s3.upload(configuration.getString("upload.s3.remotePath") + partyStatsFile.getName(), partyStatsFile);
             s3.upload(configuration.getString("upload.s3.remotePath") + subjectFile.getName(), subjectFile);
 
         }

@@ -127,6 +127,7 @@ public class StatsProcessor {
         return map;
     }
 
+    @Deprecated
     public Map<String, Map<VoteTypes, AtomicLong>> processPartyFromPerson(Map<String, Map<VoteTypes, AtomicLong>> previousState, List<Person> persons, int period) {
 
 

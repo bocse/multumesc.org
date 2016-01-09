@@ -54,11 +54,19 @@
 
 <body>
 
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=219614728082416";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
 
     <div id="wrapper">
 
         <!-- Navigation -->
-        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0; padding-right:23px;">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
@@ -66,7 +74,10 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">Mulțumesc.org - Cum ne poți susține?</a>
+                <a class="navbar-brand" href="/">
+                    <img class="pull-left" width="48" height="48" src="images/logo.gif" alt="Absent"/>
+                    Mulțumesc.org - Cum ne poți susține?
+                </a>
             </div>
             <!-- /.navbar-header -->
 
@@ -86,9 +97,10 @@
                 <div class="col-lg-10">
                     <h1 class="page-header">Spune-le prietenilor</h1>
 
-                    <p>Spune-le prietenilor, colegilor, părinților, profesorilor depsre Mulțumesc.org</p>
-                    <p>Indiferent că le spui la o bere, pe Facebook, pe Whatapp sau le telefon - și ei merită să fie informați atunci când vor vota.</p>
-
+                    <p>Spune-le prietenilor tăi să le spună și prietenilor lor  despre <a href="http://multumesc.org"> Mulțumesc.org</a></p>
+                    <p>Spune-le și părinților, colegilor, șefilor, profesorilor. De fapt, spune-i și vecinei care îți bate în țeavă.</p>
+                    <p>Toți cetățenii merită să știe cât de implicați sunt reprezentanții lor.</p>
+                    <div class="fb-like" data-href="http://multumesc.org/" data-width="200" data-layout="box_count" data-action="recommend" data-show-faces="true" data-share="true"></div>
 
                 </div>
 
@@ -100,7 +112,8 @@
                 <div class="col-lg-10 pull-right">
                     <h1 class="page-header">Fă o donație</h1>
                     <p>Mii de oameni folosesc deja Mulțumesc.ro în fiecare zi.</p>
-                    <p>Infrastructura tehnică necesară pentru a prelucra și a livra aceaste statistici costă.</p>
+                    <p>Pentru a ne păstra obiectivitatea și imparțialitatea, nu vom afișa niciodată reclame. Ar fi cam aiurea să punem AdSense și să ajungeți să vedeți propagandă electorală pe site-ul nostru în mijlocul campaniei, nu?</p>
+                    <p>Infrastructura tehnică necesară pentru a prelucra și a livra aceaste statistici vine cu niște costuri.</p>
                     <p>Dacă vrei să suporți o parte din acest cost alături de noi, ne poți ajuta cu o donație</p>
                     <p>
                     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
@@ -117,9 +130,9 @@
             <div class="row">
                 <div class="col-lg-10">
                     <h1 class="page-header">Ajută-ne să construim în continuare</h1>
-                    <p>Dacă ai experiență în web application development, natural language processing, statistică sau baze de date,  <a href="/contact.html">trimite-ne un mesaj</a></p>
-                    <p>Vrem să facem din Mulțumesc.org mult mai mult </p>
-
+                    <p>Noi am investit sute de ore în acest proiect.</p>
+                    <p>Vrem să facem din Mulțumesc.org mult mai mult decât un catalog de prezență. Și sincer vrem să-l face să arate mai bine. Dar nu putem să le facem pe toate singuri.</p>
+                    <p>Dacă ai experiență în UI development, HTML 5 / CSS 3 / jQuery, web application development, natural language processing, Java, Spring Boot, statistică sau baze de date,  <a href="/contact.html">trimite-ne un mesaj</a>.</p>
                 </div>
 
                 <!-- /.col-lg-12 -->

@@ -10,6 +10,13 @@
     <meta name="author" content="B.B.">
 
     <title>Multumesc.org - Prezența la zi a deputaților României</title>
+    <link rel="shortcut icon" type="image/gif" href="images/logo.gif"/>
+    <link rel="image_src" type="image/jpeg" href="http://multumesc.org/images/logo_400.jpg" />
+    <meta property="og:url"                content="http://multumesc.org" />
+    <meta property="og:type"               content="website" />
+    <meta property="og:title"              content="Prezența la zi a deputaților României " />
+    <meta property="og:description"        content="Află exact cât lipsește fiecare deputat de la ședinte. Statistici actualizate zilnic, individual și per partid." />
+    <meta property="og:image"              content="http://multumesc.org/images/logo_400.jpg" />
 
     <!-- jQuery -->
     <script src="bower_components/jquery/dist/jquery.min.js"></script>
@@ -37,6 +44,7 @@
 
     <link href="bower_components/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <script src="bower_components/flot/excanvas.min.js"></script>
+    <script src="bower_components/clipboard.min.js"></script>
     <script src="bower_components/flot/jquery.flot.js"></script>
     <script src="bower_components/flot/jquery.flot.pie.js"></script>
     <script src="bower_components/flot/jquery.flot.resize.js"></script>
@@ -66,7 +74,8 @@
 <div id="wrapper">
 
     <!-- Navigation -->
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <nav class="navbar navbar-default navbar-static-top" role="navigation"
+         style="margin-bottom: 0; padding-right:23px;">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -74,7 +83,10 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Mulțumesc.org - Prezența la zi a deputaților României</a>
+            <a class="navbar-brand" href="/">
+                <img class="pull-left" width="48" height="48" src="images/logo.gif" alt="Absent"/>
+                Mulțumesc.org - Prezența la zi a deputaților României
+            </a>
         </div>
         <!-- /.navbar-header -->
 
@@ -92,9 +104,22 @@
     <div id="page-wrapper">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Statistici de prezență pentru Camera Deputaților</h1>
+                <h1 class="page-header">Statistici de absență pentru Camera Deputaților</h1>
             </div>
             <!-- /.col-lg-12 -->
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <p>Absență medie în Camera Deputaților -
+                    <span>30 zile: <span id="global30">%</span></span> -
+                    <span>90 zile: <span id="global90">%</span> </span>-
+                    <span>365 zile: <span id="global365">%</span></span> -
+                    <span>Întregul mandat: <span id="globalAll">%</span></span>
+                     <div id="facebookShareUrl" class="fb-like" data-href="http://multumesc.org/" data-layout="button_count" data-action="recommend" data-show-faces="true" data-share="true"></div>
+
+                </p>
+
+            </div>
         </div>
         <!-- /.row -->
         <div class="row">
@@ -109,20 +134,11 @@
                             <table class="table table-striped table-bordered" cellspacing="0" width="100%"
                                    id="dataTables-example">
                                 <thead>
-                                <tr>
-                                    <th>Nume</th>
-                                    <th>Partid</th>
-                                    <th>Județ</th>
-                                    <th>Colegiu</th>
-                                    <th>Prezență 30 zile</th>
-                                    <th>Prezență 90 zile</th>
-                                    <th>Prezență 365 zile</th>
-                                    <th>Prezență mandat</th>
-                                </tr>
+                                <tr role="row"><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-label="Nume: sortare crescătoare" style="width: 65px;">Nume</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-label="Partid: sortare crescătoare" style="width: 68px;">Partid</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-label="Județ: sortare crescătoare" style="width: 38px;">Județ</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-label="Colegiu: sortare crescătoare" style="width: 52px;">Colegiu</th><th class="sorting_desc" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-sort="descending" aria-label="Absențe în ultimele 30 zile: sortare crescătoare" style="width: 56px;">Absențe în ultimele 30 zile</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-label="Absență în ultimele 90 zile: sortare crescătoare" style="width: 56px;">Absență în ultimele 90 zile</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-label="Absență în ultimele 365 zile: sortare crescătoare" style="width: 56px;">Absență în ultimele 365 zile</th><th class="sorting" tabindex="0" aria-controls="dataTables-example" rowspan="1" colspan="1" aria-label="Absență per mandat: sortare crescătoare" style="width: 56px;">Absență per mandat</th></tr>
                                 </thead>
                                 <tbody>
                                 <tr class="odd">
-                                    <td>Se încarcă informațiile de prezență despre deputați ...</td>
+                                    <td><b>Se încarcă informațiile de prezență despre deputați ...<b></b></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -131,6 +147,17 @@
                                     <td></td>
                                     <td></td>
                                 </tr>
+                                <tr class="odd">
+                                    <td>...</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr role="row" class="odd"><td>Vlad-Alexandru COSMA</td><td>PSD</td><td>Prahova</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Emil NIŢĂ</td><td>PSD</td><td>Brasov</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe-Dănuţ BOGDAN</td><td>PSD</td><td>Bihor</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihai-Răzvan STURZU</td><td>INDEPENDENT</td><td>Bucuresti</td><td>24</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Vicenţiu-Mircea IRIMIE</td><td>PC</td><td>Cluj</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Adrian Constantin SIMIONESCU</td><td>PSD</td><td>Teleorman</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Florin Aurelian POPESCU</td><td>INDEPENDENT</td><td>Dambovita</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Aurelian IONESCU</td><td>PC</td><td>Ialomita</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dumitru CHIRIŢĂ</td><td>PSD</td><td>Bucuresti</td><td>20</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ionuţ-Cristian SĂVOIU</td><td>PSD</td><td>Dambovita</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Zisu STANCIU</td><td>PSD</td><td>Dambovita</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cristian BUICAN</td><td>PNL</td><td>Valcea</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ion EPARU</td><td>PSD</td><td>Prahova</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Daniel Vasile OAJDEA</td><td>INDEPENDENT</td><td>Iasi</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan BENGA</td><td>PSD</td><td>Caras-severin</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dan-Cristian POPESCU</td><td>PNL</td><td>Bucuresti</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Vasile Ghiorghe GLIGA</td><td>PSD</td><td>Mures</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion-Marcel CIOLACU</td><td>PSD</td><td>Buzau</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Daniel-Ionuţ BĂRBULESCU</td><td>PSD</td><td>Olt</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Nuţu FONTA</td><td>UNPR</td><td>Maramures</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan AXENTE</td><td>PSD</td><td>Sibiu</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Angel TÎLVĂR</td><td>PSD</td><td>Vrancea</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>KORODI Attila</td><td>UDMR</td><td>Harghita</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion MELINTE</td><td>PSD</td><td>Bacau</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Oana MANOLESCU</td><td>ASOCIAŢIA LIGA ALBANEZILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Adrian-Miroslav MERKA</td><td>UNIUNEA DEMOCRATICĂ A SLOVACILOR ŞI CEHILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Florică BÎRSĂŞTEANU</td><td>PSD</td><td>Timis</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Laura MARIN</td><td>PSD</td><td>Galati</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Aurel NICULAE</td><td>UNPR</td><td>Calarasi</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion MAROCICO</td><td>UNIUNEA UCRAINENILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>SERES Dénes</td><td>UDMR</td><td>Salaj</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cătălin-Florin TEODORESCU</td><td>PNL</td><td>Arges</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mihăiţă GĂINĂ</td><td>PSD</td><td>Ialomita</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>ERDEI DOLÓCZKI István</td><td>UDMR</td><td>Satu-mare</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Laurenţiu NISTOR</td><td>PSD</td><td>Hunedoara</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Eduard-Stelian MARTIN</td><td>PSD</td><td>Constanta</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Miron IGNAT</td><td>COMUNITATEA RUŞILOR LIPOVENI DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion Cristinel MARIAN</td><td>INDEPENDENT</td><td>Valcea</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ionel STANCU</td><td>ASOCIAŢIA MACEDONENILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cristina NICHITA</td><td>PSD</td><td>Iasi</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Florin CIURARIU</td><td>PNL</td><td>Vaslui</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Răzvan Horia MIRONESCU</td><td>PNL</td><td>Bucuresti</td><td>26</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Andrei-Valentin SAVA</td><td>PSD</td><td>Prahova</td><td>12</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dorel-Gheorghe CĂPRAR</td><td>PSD</td><td>Arad</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Grigore CRĂCIUNESCU</td><td>PNL</td><td>Iasi</td><td>11</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ioan MIHĂILĂ</td><td>UNPR</td><td>Bucuresti</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>KELEMEN Hunor</td><td>UDMR</td><td>Harghita</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihai-Bogdan DIACONU</td><td>INDEPENDENT</td><td>Bucuresti</td><td>17</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Marian AVRAM</td><td>INDEPENDENT</td><td>Tulcea</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Vasile BERCI</td><td>PNL</td><td>Maramures</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan Viorel TEODORESCU</td><td>UNPR</td><td>Giurgiu</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dumitru-Verginel GIREADĂ</td><td>PNL</td><td>Botosani</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>BÓNIS István</td><td>UDMR</td><td>Maramures</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Daniel-Cătălin ZAMFIR</td><td>PNL</td><td>Brasov</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Sorin TEJU</td><td>INDEPENDENT</td><td>Prahova</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Adrian GURZĂU</td><td>INDEPENDENT</td><td>Cluj</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Victor ROMAN</td><td>PSD</td><td>Vrancea</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Rovana PLUMB</td><td>PSD</td><td>Dambovita</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Vasile VARGA</td><td>PNL</td><td>Braila</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>KERESKÉNYI Gábor</td><td>UDMR</td><td>Satu-mare</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Rodica NASSAR</td><td>PSD</td><td>Bucuresti</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>CSEKE Attila-Zoltán</td><td>UDMR</td><td>Bihor</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe IALOMIŢIANU</td><td>PNL</td><td>Brasov</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ghervazen LONGHER</td><td>UNIUNEA POLONEZILOR DIN ROMÂNIA "DOM POLSKI"</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Valeriu-Andrei STERIU</td><td>UNPR</td><td>Calarasi</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Iulian VLADU</td><td>PNL</td><td>Dambovita</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Horia CRISTIAN</td><td>PNL</td><td>Timis</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Daniel IANE</td><td>PNL</td><td>Dolj</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Florin-Costin PÂSLARU</td><td>PSD</td><td>Galati</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Sergiu-Constantin VIZITIU</td><td>UNPR</td><td>Vaslui</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cristian-Constantin ROMAN</td><td>PNL</td><td>Botosani</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihai Alexandru VOICU</td><td>PNL</td><td>Dolj</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Natalia-Elena INTOTERO</td><td>PSD</td><td>Hunedoara</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Vasile GUDU</td><td>PNL</td><td>Tulcea</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dumitru PARDĂU</td><td>PNL</td><td>Suceava</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Aurel VAINER</td><td>FEDERAŢIA COMUNITĂŢILOR EVREIEŞTI DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan TĂMÂIAN</td><td>PNL</td><td>Sibiu</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Liviu CODÎRLĂ</td><td>UNPR</td><td>Tulcea</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cătălin-Daniel FENECHIU</td><td>INDEPENDENT</td><td>Bucuresti</td><td>19</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ştefan BURLACU</td><td>INDEPENDENT</td><td>Ilfov</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Graţiela Leocadia GAVRILESCU</td><td>INDEPENDENT</td><td>Prahova</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ioan MOLDOVAN</td><td>PC</td><td>Cluj</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Daniel TUDORACHE</td><td>PSD</td><td>Bucuresti</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Andrei-Răzvan CONDURĂŢEANU</td><td>INDEPENDENT</td><td>Constanta</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mircea-Nicu TOADER</td><td>PNL</td><td>Galati</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>MÁRTON Árpád-Francisc</td><td>UDMR</td><td>Covasna</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>KELEMEN Atilla-Béla-László</td><td>UDMR</td><td>Mures</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gheorghe COSTIN</td><td>PNL</td><td>Bihor</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Iulian IANCU</td><td>PSD</td><td>Bacau</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>MÁTÉ András-Levente</td><td>UDMR</td><td>Cluj</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Daniel FLOREA</td><td>PSD</td><td>Calarasi</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Victor-Gheorghe MANEA</td><td>PNL</td><td>Constanta</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Camelia KHRAIBANI</td><td>PSD</td><td>Gorj</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Slavomir GVOZDENOVICI</td><td>UNIUNEA SÂRBILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Nicolae-Ciprian NICA</td><td>PSD</td><td>Vrancea</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Eleonora-Carmen HĂRĂU</td><td>PNL</td><td>Hunedoara</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cosmin NECULA</td><td>PSD</td><td>Bacau</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cristina-Ancuţa POCORA</td><td>PNL</td><td>Ialomita</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cornelia NEGRUŢ</td><td>PC</td><td>Maramures</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Constantin ADĂSCĂLIŢEI</td><td>PSD</td><td>Iasi</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Aurelian MIHAI</td><td>INDEPENDENT</td><td>Diaspora</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ovidiu Alexandru RAEŢCHI</td><td>PNL</td><td>Diaspora</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Octavian PETRIC</td><td>PSD</td><td>Satu-mare</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mario-Ernest CALOIANU</td><td>UNPR</td><td>Ialomita</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Radu BABUŞ</td><td>PSD</td><td>Constanta</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion RĂDUCANU</td><td>UNPR</td><td>Timis</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Constantin MAZILU</td><td>UNPR</td><td>Valcea</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Daniel-Stamate BUDURESCU</td><td>PNL</td><td>Bucuresti</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Marin ALMĂJANU</td><td>PNL</td><td>Teleorman</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>KEREKES Károly</td><td>UDMR</td><td>Mures</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dragoş Gabriel ZISOPOL</td><td>UNIUNEA ELENĂ DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Răzvan-Ionuţ TĂNASE</td><td>INDEPENDENT</td><td>Prahova</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Adrian-Nicolae DIACONU</td><td>UNPR</td><td>Timis</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>BORBÉLY László</td><td>UDMR</td><td>Mures</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dan-Ştefan MOTREANU</td><td>PNL</td><td>Calarasi</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Radu Mihai POPA</td><td>INDEPENDENT</td><td>Dambovita</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe-Eugen NICOLĂESCU</td><td>PNL</td><td>Bucuresti</td><td>11</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gabriela-Maria PODAŞCĂ</td><td>PSD</td><td>Bucuresti</td><td>14</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Niculae MIRCOVICI</td><td>UNIUNEA BULGARA DIN BANAT</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florin IORDACHE</td><td>PSD</td><td>Olt</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan STAN</td><td>PSD</td><td>Suceava</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Paul DUMBRĂVANU</td><td>PNL</td><td>Prahova</td><td>11</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Viorel PALAŞCĂ</td><td>INDEPENDENT</td><td>Mehedinti</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gheorghe MARIN</td><td>PSD</td><td>Arges</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Nicolae PĂUN</td><td>PARTIDA ROMILOR "PRO-EUROPA"</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ştefan-Alexandru BĂIŞANU</td><td>PNL</td><td>Suceava</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Lucian MILITARU</td><td>PNL</td><td>Teleorman</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cristian-George SEFER</td><td>UNPR</td><td>Mures</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Titi HOLBAN</td><td>UNPR</td><td>Buzau</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>MOLNAR Zsolt</td><td>UDMR</td><td>Timis</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe UDRIŞTE</td><td>PNL</td><td>Bucuresti</td><td>25</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion CĂLIN</td><td>PSD</td><td>Dolj</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Adriana-Doina PANĂ</td><td>PSD</td><td>Bistrita-nasaud</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Lucia-Ana VARGA</td><td>PNL</td><td>Bihor</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Petre DAEA</td><td>PSD</td><td>Mehedinti</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Vasile ILIUŢĂ</td><td>PNL</td><td>Calarasi</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Virgil GURAN</td><td>PNL</td><td>Prahova</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion BĂLAN</td><td>PSD</td><td>Tulcea</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Petru-Sorin MARICA</td><td>PSD</td><td>Hunedoara</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mircea ROŞCA</td><td>PNL</td><td>Prahova</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Tamara-Dorina CIOFU</td><td>PSD</td><td>Botosani</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Laurenţiu CHIRVĂSUŢĂ</td><td>UNPR</td><td>Galati</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Varujan PAMBUCCIAN</td><td>UNIUNEA ARMENILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Alexandri NICOLAE</td><td>INDEPENDENT</td><td>Prahova</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Viorel-Ionel BLĂJUŢ</td><td>INDEPENDENT</td><td>Iasi</td><td>12</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion MOCIOALCĂ</td><td>PSD</td><td>Caras-severin</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Valentin BLĂNARIU</td><td>UNPR</td><td>Caras-severin</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Claudiu-Andrei TĂNĂSESCU</td><td>PC</td><td>Bucuresti</td><td>16</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe FRĂTICIU</td><td>PSD</td><td>Sibiu</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>George IONESCU</td><td>PNL</td><td>Prahova</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Vlad MARCOCI</td><td>PSD</td><td>Neamt</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Lucian-Manuel CIUBOTARU</td><td>PNL</td><td>Bacau</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Vasile-Cătălin DRĂGUŞANU</td><td>PC</td><td>Neamt</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ioan-Cristian CHIRTEŞ</td><td>PNL</td><td>Mures</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cezar-Florin PREDA</td><td>PNL</td><td>Buzau</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Andrei Dominic GEREA</td><td>INDEPENDENT</td><td>Arges</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cornel-Cristian RESMERIŢĂ</td><td>PSD</td><td>Hunedoara</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mircea MAN</td><td>PNL</td><td>Maramures</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Eugen TOMAC</td><td>INDEPENDENT</td><td>Diaspora</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Liviu HARBUZ</td><td>PSD</td><td>Neamt</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Remus-Florinel CERNEA</td><td>VERZII</td><td>Constanta</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Marin ANTON</td><td>UNPR</td><td>Giurgiu</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Liliana CIOBANU</td><td>INDEPENDENT</td><td>Giurgiu</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gheorghe EMACU</td><td>UNPR</td><td>Iasi</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Iulian Claudiu MANDA</td><td>PSD</td><td>Dolj</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mircea DUŞA</td><td>PSD</td><td>Harghita</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Camelia-Margareta BOGDĂNICI</td><td>UNPR</td><td>Iasi</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cătălin-Marian RĂDULESCU</td><td>PSD</td><td>Arges</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ana BIRCHALL</td><td>PSD</td><td>Vaslui</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Eugen BEJINARIU</td><td>PSD</td><td>Suceava</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Costel ALEXE</td><td>PNL</td><td>Iasi</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Scarlat IRIZA</td><td>UNPR</td><td>Gorj</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Tinel GHEORGHE</td><td>PNL</td><td>Ialomita</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Rodin TRAICU</td><td>PSD</td><td>Mehedinti</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Georgian POP</td><td>PSD</td><td>Bucuresti</td><td>21</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cornel-George COMŞA</td><td>INDEPENDENT</td><td>Alba</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Lucian Nicolae BODE</td><td>PNL</td><td>Salaj</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Victor-Viorel PONTA</td><td>PSD</td><td>Gorj</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Hubert Petru Ştefan THUMA</td><td>PNL</td><td>Ilfov</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Simona BUCURA-OPRESCU</td><td>PSD</td><td>Arges</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Irinel Ioan STATIVĂ</td><td>PSD</td><td>Vaslui</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Steluţa-Gustica CĂTĂNICIU</td><td>INDEPENDENT</td><td>Cluj</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe ROMAN</td><td>PSD</td><td>Sibiu</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Iulian-Radu SURUGIU</td><td>PNL</td><td>Suceava</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Lucian ŞOVA</td><td>PSD</td><td>Bacau</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ovidiu-Ioan DUMITRU</td><td>INDEPENDENT</td><td>Bucuresti</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ion TABUGAN</td><td>UNPR</td><td>Caras-severin</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gheorghe FIRCZAK</td><td>UNIUNEA CULTURALĂ A RUTENILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Viorel ŞTEFAN</td><td>PSD</td><td>Galati</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Damian FLOREA</td><td>PC</td><td>Bucuresti</td><td>27</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dorinel URSĂRESCU</td><td>INDEPENDENT</td><td>Neamt</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mădălin-Ştefan VOICU</td><td>PSD</td><td>Constanta</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mihai TUDOSE</td><td>PSD</td><td>Braila</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florentin GUST BĂLOŞIN</td><td>INDEPENDENT</td><td>Dolj</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dumitru-Iulian POPESCU</td><td>UNPR</td><td>Bucuresti</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Viorica MARCU</td><td>PNL</td><td>Bacau</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Florian Daniel GEANTĂ</td><td>UNPR</td><td>Bucuresti</td><td>24</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gigel-Sorinel ŞTIRBU</td><td>PNL</td><td>Olt</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cătălin TIUCH</td><td>PSD</td><td>Timis</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florica CHERECHEŞ</td><td>PNL</td><td>Bihor</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Raluca-Cristina ISPIR</td><td>PNL</td><td>Bucuresti</td><td>12</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ioan VULPESCU</td><td>PSD</td><td>Bucuresti</td><td>13</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Daniel CHIŢOIU</td><td>INDEPENDENT</td><td>Giurgiu</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Giureci-Slobodan GHERA</td><td>UNIUNEA CROAŢILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Liviu-Bogdan CIUCĂ</td><td>PC</td><td>Galati</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Elena Gabriela UDREA</td><td>INDEPENDENT</td><td>Neamt</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Lucreţia ROŞCA</td><td>PSD</td><td>Galati</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ioan BALAN</td><td>PNL</td><td>Suceava</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Nechita-Adrian OROS</td><td>PNL</td><td>Cluj</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Constantin-Cosmin ENEA</td><td>PSD</td><td>Dolj</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Răzvan ROTARU</td><td>INDEPENDENT</td><td>Gorj</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Alexandru NAZARE</td><td>PNL</td><td>Braila</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ovidiu-Cristian IANE</td><td>PSD</td><td>Suceava</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Virgil DELUREANU</td><td>PSD</td><td>Olt</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Theodor PALEOLOGU</td><td>INDEPENDENT</td><td>Bucuresti</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Iacob PUŞCAŞ</td><td>UNPR</td><td>Sibiu</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Eusebiu-Manea PISTRU-POPA</td><td>PNL</td><td>Arad</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ninel PEIA</td><td>PSD</td><td>Ilfov</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan MUNTEANU</td><td>PSD</td><td>Neamt</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion ŞCHEAU</td><td>PNL</td><td>Arad</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Elena Cătălina ŞTEFĂNESCU</td><td>PSD</td><td>Teleorman</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gheorghe-Mirel TALOŞ</td><td>INDEPENDENT</td><td>Salaj</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Aurelia CRISTEA</td><td>PSD</td><td>Cluj</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ion-Bogdan MIHĂILESCU</td><td>PSD</td><td>Bucuresti</td><td>28</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dan CIOCAN</td><td>PSD</td><td>Olt</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Liviu LAZA-MATIUŢA</td><td>PNL</td><td>Bihor</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Adriana Diana TUŞA</td><td>PNL</td><td>Bucuresti</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ioan CUPŞA</td><td>PNL</td><td>Bihor</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe-Vlad NISTOR</td><td>PNL</td><td>Bucuresti</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Constantin DASCĂLU</td><td>PNL</td><td>Dolj</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Georgică DUMITRU</td><td>PC</td><td>Dambovita</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cristian RIZEA</td><td>PSD</td><td>Braila</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Manuela MITREA</td><td>PSD</td><td>Constanta</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Nini SĂPUNARU</td><td>PNL</td><td>Vrancea</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Erland COCEI</td><td>PNL</td><td>Buzau</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Iuliu NOSA</td><td>PSD</td><td>Salaj</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mihai DEACONU</td><td>INDEPENDENT</td><td>Arges</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Alexandru STĂNESCU</td><td>PSD</td><td>Olt</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Maria-Andreea PAUL</td><td>PNL</td><td>Satu-mare</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Tudor CIUHODARU</td><td>UNPR</td><td>Vaslui</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Liliana MINCĂ</td><td>UNPR</td><td>Botosani</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Toader DIMA</td><td>PSD</td><td>Vaslui</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ovidiu Victor GANŢ</td><td>FORUMUL DEMOCRAT AL GERMANILOR DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Traian DOBRINESCU</td><td>PNL</td><td>Valcea</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Nicolae BĂNICIOIU</td><td>PSD</td><td>Bucuresti</td><td>18</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florin GHEORGHE</td><td>UNPR</td><td>Constanta</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ion PÂRGARU</td><td>UNPR</td><td>Dambovita</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Marius MANOLACHE</td><td>PSD</td><td>Mehedinti</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Dan BORDEIANU</td><td>PSD</td><td>Vaslui</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Valerian VREME</td><td>UNPR</td><td>Bacau</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Costică CANACHEU</td><td>PNL</td><td>Bucuresti</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florian NICOLAE</td><td>PNL</td><td>Giurgiu</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Carmen Ileana MOLDOVAN</td><td>PSD</td><td>Dambovita</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Laurenţiu ŢIGĂERU ROŞCA</td><td>UNPR</td><td>Vrancea</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Nechita-Stelian DOLHA</td><td>PNL</td><td>Bistrita-nasaud</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihaela STOICA</td><td>INDEPENDENT</td><td>Neamt</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Valeriu Ştefan ZGONEA</td><td>PSD</td><td>Dolj</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Romeo RĂDULESCU</td><td>INDEPENDENT</td><td>Valcea</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Constantin MOISII</td><td>UNPR</td><td>Neamt</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dan Coriolan SIMEDRU</td><td>PNL</td><td>Alba</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gheorghe ŞIMON</td><td>PSD</td><td>Maramures</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florin-Cristian TĂTARU</td><td>PSD</td><td>Maramures</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Marian ENACHE</td><td>UNPR</td><td>Neamt</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Raluca SURDU</td><td>PNL</td><td>Calarasi</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Eugen CHEBAC</td><td>UNPR</td><td>Galati</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ludovic ORBAN</td><td>PNL</td><td>Bucuresti</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Valeria-Diana SCHELEAN-ŞOMFELEAN</td><td>PNL</td><td>Caras-severin</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ionel PALĂR</td><td>PNL</td><td>Bacau</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Neviser ZAHARCU</td><td>PSD</td><td>Tulcea</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mircea LUBANOVICI</td><td>PNL</td><td>Diaspora</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Victor Paul DOBRE</td><td>PNL</td><td>Galati</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gabriel ANDRONACHE</td><td>PNL</td><td>Brasov</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Flavius-Luigi MĂDUŢA</td><td>PSD</td><td>Arad</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Petre PETRESCU</td><td>INDEPENDENT</td><td>Dolj</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Raluca TURCAN</td><td>PNL</td><td>Sibiu</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Horia GRAMA</td><td>PSD</td><td>Covasna</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Luminiţa-Pachel ADAM</td><td>UNPR</td><td>Olt</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ileana Cristina DUMITRACHE</td><td>PSD</td><td>Constanta</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>FEJÉR László-Ődőn</td><td>UDMR</td><td>Covasna</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Constantin NIŢĂ</td><td>PSD</td><td>Brasov</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Iusein IBRAM</td><td>UNIUNEA DEMOCRATĂ TURCĂ DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Corneliu-Mugurel COZMANCIUC</td><td>PNL</td><td>Iasi</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Călin POTOR</td><td>PSD</td><td>Alba</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihai TARARACHE</td><td>INDEPENDENT</td><td>Constanta</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan OLTEAN</td><td>PNL</td><td>Bistrita-nasaud</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihai-Aurel DONŢU</td><td>PNL</td><td>Brasov</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Anghel STANCIU</td><td>PSD</td><td>Iasi</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Constantin-Stelian-Emil MOŢ</td><td>PSD</td><td>Olt</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cornel ITU</td><td>PSD</td><td>Cluj</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dragoş-Ionel GUNIA</td><td>INDEPENDENT</td><td>Prahova</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ion STAN</td><td>PSD</td><td>Dambovita</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Sebastian-Aurelian GHIŢĂ</td><td>PSD</td><td>Prahova</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Radu Bogdan ŢÎMPĂU</td><td>PNL</td><td>Hunedoara</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Viorel Marian DRAGOMIR</td><td>PSD</td><td>Braila</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Petru ANDEA</td><td>PSD</td><td>Timis</td><td>8</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Valentin RUSU</td><td>PNL</td><td>Caras-severin</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Romeo Florin NICOARĂ</td><td>PNL</td><td>Bucuresti</td><td>20</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Anton DOBOŞ</td><td>PNL</td><td>Iasi</td><td>12</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Vasile-Daniel SUCIU</td><td>PSD</td><td>Bistrita-nasaud</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mircea-Titus DOBRE</td><td>PSD</td><td>Constanta</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Petru MOVILĂ</td><td>INDEPENDENT</td><td>Iasi</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Claudia BOGHICEVICI</td><td>PNL</td><td>Arad</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>George SCARLAT</td><td>PNL</td><td>Galati</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Corneliu-Florin BUICU</td><td>PSD</td><td>Mures</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Niculina MOCIOI</td><td>PNL</td><td>Gorj</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Daniel CONSTANTIN</td><td>PC</td><td>Arges</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Cezar CIOATĂ</td><td>PSD</td><td>Suceava</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ionel ARSENE</td><td>PSD</td><td>Neamt</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mircea-Gheorghe DRĂGHICI</td><td>PSD</td><td>Arges</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Radu STROE</td><td>UNPR</td><td>Ilfov</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Radu ZLATI</td><td>PNL</td><td>Cluj</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Călin-Vasile-Andrei MATEI</td><td>PSD</td><td>Maramures</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mircia MUNTEAN</td><td>PSD</td><td>Hunedoara</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ştefan-Petru DALCA</td><td>UNPR</td><td>Arad</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Constantin RĂDULESCU</td><td>PSD</td><td>Valcea</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Violeta TUDORIE</td><td>PSD</td><td>Bucuresti</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Sorin Constantin STRAGEA</td><td>PSD</td><td>Timis</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>SZABÓ Ödön</td><td>UDMR</td><td>Bihor</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Constantin AVRAM</td><td>PC</td><td>Bacau</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ioana-Jenica DUMITRU</td><td>UNPR</td><td>Arges</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Adrian SOLOMON</td><td>PSD</td><td>Vaslui</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihai LUPU</td><td>PNL</td><td>Constanta</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Sonia-Maria DRĂGHICI</td><td>PSD</td><td>Bihor</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Maria GRECEA</td><td>PNL</td><td>Brasov</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Sorin Mihai GRINDEANU</td><td>PSD</td><td>Timis</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florin Mihail SECARĂ</td><td>PNL</td><td>Vrancea</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Constantin GALAN</td><td>INDEPENDENT</td><td>Suceava</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Marian NEACŞU</td><td>PSD</td><td>Ialomita</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>MOLDOVAN Iosif</td><td>UDMR</td><td>Harghita</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gheorghe DRAGOMIR</td><td>PNL</td><td>Constanta</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ion CUPĂ</td><td>INDEPENDENT</td><td>Gorj</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dumitru NICULESCU</td><td>UNPR</td><td>Olt</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mihăiţă CALIMENTE</td><td>PNL</td><td>Arad</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dorin Silviu PETREA</td><td>UNPR</td><td>Braila</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Elena-Ramona REUER&nbsp;&nbsp;&nbsp;&nbsp;(Uioreanu)</td><td>PNL</td><td>Cluj</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Constantin-Alin BUCUR</td><td>UNPR</td><td>Teleorman</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mircea-Vasile CAZAN</td><td>PNL</td><td>Sibiu</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Clement NEGRUŢ</td><td>INDEPENDENT</td><td>Alba</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Bogdan Nicolae NICULESCU DUVĂZ</td><td>PSD</td><td>Arges</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Florin-Alexandru ALEXE</td><td>PNL</td><td>Bucuresti</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Gabriela-Lola ANGHEL</td><td>INDEPENDENT</td><td>Prahova</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Cornel-Mircea SĂMĂRTINEAN</td><td>PNL</td><td>Timis</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan Sorin ROMAN</td><td>PSD</td><td>Bihor</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ionaş-Florin URCAN</td><td>PNL</td><td>Mures</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Florică Ică CALOTĂ</td><td>INDEPENDENT</td><td>Teleorman</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dorel COVACI</td><td>PSD</td><td>Timis</td><td>9</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Alin Augustin Florin POPOVICIU</td><td>PNL</td><td>Timis</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>ANTAL István</td><td>UDMR</td><td>Harghita</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Radu Costin VASILICĂ</td><td>PSD</td><td>Arges</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Costel ŞOPTICĂ</td><td>PNL</td><td>Botosani</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Andrei Daniel GHEORGHE</td><td>PNL</td><td>Ilfov</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Octavian-Marius POPA</td><td>PNL</td><td>Tulcea</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Varol AMET</td><td>UNIUNEA DEMOCRATĂ A TĂTARILOR TURCO-MUSULMANI DIN ROMÂNIA</td><td>NATIONAL</td><td>-</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Neagu MURGU</td><td>UNPR</td><td>Vrancea</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mircea DOLHA</td><td>PNL</td><td>Maramures</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Eugen Constantin URICEC</td><td>PSD</td><td>Suceava</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Petru Gabriel VLASE</td><td>PSD</td><td>Bacau</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Gavril MÎRZA</td><td>PSD</td><td>Suceava</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan DÎRZU</td><td>PSD</td><td>Alba</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Sanda-Maria ARDELEANU</td><td>PNL</td><td>Suceava</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Vasile HORGA</td><td>PNL</td><td>Dambovita</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Vasile POPEANGĂ</td><td>PSD</td><td>Gorj</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Adrian MOCANU</td><td>PSD</td><td>Buzau</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Roxana-Florentina ANUŞCA</td><td>PNL</td><td>Botosani</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Ioan HULEA</td><td>UNPR</td><td>Bihor</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Dan-Laurenţiu TOCUŢ</td><td>INDEPENDENT</td><td>Caras-severin</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Victor CRISTEA</td><td>PSD</td><td>Vaslui</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Mihai BALTĂ</td><td>PSD</td><td>Botosani</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Marioara NISTOR</td><td>UNPR</td><td>Braila</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Roberta Alma ANASTASE</td><td>PNL</td><td>Prahova</td><td>11</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Maria DRAGOMIR</td><td>INDEPENDENT</td><td>Calarasi</td><td>1</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Eugen NICOLICEA</td><td>UNPR</td><td>Buzau</td><td>6</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Miron Alexandru SMARANDACHE</td><td>PSD</td><td>Bacau</td><td>7</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ionuţ-Marian STROE</td><td>PNL</td><td>Dolj</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Andrei DOLINEASCHI</td><td>PSD</td><td>Botosani</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Neculai RĂŢOI</td><td>PSD</td><td>Iasi</td><td>5</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Mihai WEBER</td><td>PSD</td><td>Gorj</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Ovidiu Ioan SILAGHI</td><td>INDEPENDENT</td><td>Satu-mare</td><td>2</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Valentin Gabriel BOBOC</td><td>PSD</td><td>Teleorman</td><td>4</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Alina-Ştefania GORGHIU</td><td>PNL</td><td>Bucuresti</td><td>22</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="odd"><td>Nicolae-Liviu DRAGNEA</td><td>PSD</td><td>Teleorman</td><td>3</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr><tr role="row" class="even"><td>Sorin-Avram IACOBAN</td><td>PSD</td><td>Iasi</td><td>10</td><td class="sorting_1">%</td><td>%</td><td>%</td><td>%</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -144,20 +171,79 @@
             </div>
             <!-- /.col-lg-12 -->
         </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        Rata de absență per partid
+                    </div>
+                    <!-- /.panel-heading -->
+                    <div class="panel-body">
+                        <div class="btn-group" data-toggle="buttons">
+                            <p><label>Alege perioada:</label>
+
+                                <label class="btn btn-primary active">
+                                    <input type="radio" name="options" id="button-30" autocomplete="off" checked="true"/>30 zile
+                                </label>
+
+                                <label class="btn btn-primary active">
+                                    <input type="radio" name="options" id="button-90" autocomplete="off" checked="true"/>90 zile
+                                </label>
+
+                                <label class="btn btn-primary active">
+                                    <input type="radio" name="options" id="button-365" autocomplete="off" checked="true"/>365 zile
+                                </label>
+
+                                <label class="btn btn-primary active">
+                                    <input type="radio" name="options" id="button-all" autocomplete="off" checked="true"/>de la începutul mandatului
+                                </label>
+                            </p>
+
+
+                        </div>
+
+                        <div class="flot-chart">
+                            <div class="flot-chart-content" id="flot-bar-chart"></div>
+                            <p><i>* Activitatea deputaților care au schimbat partidul în timpul mandatului este atribuită partidului din care fac parte în prezent.</i></p>
+
+                            <p>
+                                <a class="btn btn-default pull-right" href="#">Înapoi la căutare în lista cu
+                                    deputați</a>
+                            </p>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- /.row -->
         <div class="row" style="display: none;" id="deputyDetailsTab">
             <div class="col-lg-12">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        Detalii despre deputat <label id="deputyDetailsTitle"></label>
+                        Detalii despre deputat <label class="deputyDetailsTitle"></label>
                     </div>
                     <!-- /.panel-heading -->
                     <div class="panel-body">
                         <div class="pull-right">
                             <a class="profileLink" target="_blank" href="#"><img id="big-picture"
-                                                                                 src="http://www.cdep.ro/parlamentari/l2012/Udrea-Elena-Gabriela.jpg"/></a>
+                                                                                 src=""/></a>
                         </div>
-                        <p>Partid: <label id="currentParty"></label></p>
+                        <div>
+                            <p>Link direct:
+                            <input id="profileURL" value="http://multumesc.org" readonly>
+                            <!-- Trigger -->
+
+                            <button class="btn glyphicon glyphicon-paperclip" data-clipboard-target="#profileURL">
+                                clipboard
+                            </button>
+                            </p>
+                            <div id="facebookShareUrl" class="fb-like" data-href="http://multumesc.org/" data-layout="button_count" data-action="recommend" data-show-faces="true" data-share="true"></div>
+
+                        </div>
+                            <p>Partid: <label id="currentParty"></label></p>
 
                         <p>Istoric partide: <label id="partyHistory"></label></p>
 
@@ -182,8 +268,10 @@
                             <div class="flot-chart-content" id="flot-line-chart"></div>
                             <p><i>* Săptămânile în care Camera Deputaților nu a avut activitate de plen NU sunt
                                 reprezentate pe grafic și NU se consideră absență.</i></p>
+
                             <p>
-                            <a class="btn btn-default pull-right" href="#">Înapoi la căutare în lista cu deputați</a>
+                                <a class="btn btn-default pull-right" href="#">Înapoi la căutare în lista cu
+                                    deputați</a>
                             </p>
                         </div>
 
@@ -192,25 +280,41 @@
                 </div>
                 <!-- /.panel -->
             </div>
-</div>
-            <div class="row" >
-                <div class="col-lg-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            Descărcați datele
-                        </div>
-                        <!-- /.panel-heading -->
-                        <div class="panel-body">
-                            <p>Datele pe baza cărora este generată această pagină sunt disponibile pentru a fi descărcate, în format JSON:</p>
-                            <p><a href="/data/personStatsTogether.json" download="">Date individuale despre deputați</a></p>
-                            <p><a href="/data/partyStats_1.json" download="">Date agregate pe partide/formațiuni politice</a></p>
-                        </div>
-                    </div>
-                </div>
+        </div>
 
-        <div class="fb-comments" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Descărcați datele
+                </div>
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    <p>Datele pe baza cărora este generată această pagină sunt disponibile pentru a fi descărcate,
+                        în format JSON:</p>
+
+                    <p><a href="/data/personStatsTogether.json" download="">Date individuale despre deputați</a></p>
+
+                    <p><a href="/data/partyStats.json" download="">Date agregate pe partide/formațiuni
+                        politice</a></p>
+
+                    <p>Informația este actualizată la 24-48 ore.</p>
+
+                    <p>Puteți folosi informația în orice fel legal și etic. Am aprecia să citați sursa ca <a
+                            href="http://multumesc.org">http://multumesc.org</a>, dar nu este obligatoriu. </p>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /#page-wrapper -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="fb-comments" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
+        </div>
+    </div>
+</div>
+<!-- /#page-wrapper -->
 
 </div>
 <!-- /#wrapper -->
@@ -228,38 +332,43 @@
     var loadedPartyData = null;
     var preparedIndividualData = null;
     var preparedPartyData = null;
-    var maxRed = 200;
-    var maxBlue = 180;
+    var maxRed = 250;
+    var maxBlue = 230;
     var epsilon = 0.00001;
     var lastUpdateDate = null;
     var lastUpdateTimestamp = null;
     var crawlTime = null;
     var errorCount = null;
     var succesful = null;
-    /*
-     $(document).ready(function() {
-     $('#dataTables-example').DataTable({
-     responsive: true,
-     ajax: '../data/personStatsTogether.json'
-     });
-     });
-     */
-
-
-    //        <p>Județ: <label id="county"></label> Colegiu: <label id="colegiu"></label></p>
-    //        <p>Rată de absenteism în ultimele 30 zile: <label id="absence30"></label></p>
-    //        <p>Rată de absenteism în ultimele 90 zile: <label id="absence90"></label></p>
-    //        <p>Rată de absenteism în ultimele 365 zile: <label id="absence365"></label></p>
-    //        <p>Rată de absenteism de la începutul legislaturii: <label id="absenceAllTerm"></label></p>
-
+    function parseParameter(val) {
+        var result = null,
+                tmp = [];
+        location.search
+            //.replace ( "?", "" )
+            // this is better, there might be a question mark inside
+                .substr(1)
+                .split("&")
+                .forEach(function (item) {
+                    tmp = item.split("=");
+                    if (tmp[0] === val) result = decodeURIComponent(tmp[1]).replace("+"," ");
+                });
+        return result;
+    }
     function profileData(nume) {
         var item = loadedIndividualData[nume];
         var smallPictureURL = item.pictureURL.replace("/mari", "");
         $('#big-picture').attr("src", smallPictureURL);
 
-        $('#deputyDetailsTitle').text(item.fullName);
+        $('.deputyDetailsTitle').text(item.fullName);
         $('#currentParty').text(item.currentParty);
         $('#partyHistory').text(item.allPartyList);
+//    <p>Link direct la statisticile deputatului  <label class="deputyDetailsTitle"></label>:<input type="text" id="profileURL"/></p>
+//
+//        <div id="facebookShareUrl" class="fb-share-button" data-href="https://developers.facebook.com/docs/plugins/" data-layout="button_count"></div>
+        var profileURL="http://multumesc.org/?deputat="+encodeURIComponent(item.fullName);
+        $('#profileURL').val(profileURL);
+        $('#facebookShareUrl').attr("data-href", profileURL);
+
         var hasContactInfo = (item.contactInformation.length > 1) && (item.contactInformation.indexOf("Luări de cuvânt") == -1);
         if (hasContactInfo)
             $('#contactInfo').text(item.contactInformation);
@@ -285,8 +394,76 @@
         $('#absenceAllTerm').css("color", ' rgb(' + Math.round(absenceAllTerm * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absenceAllTerm / 100.0) * maxBlue) + ')');
         $('.profileLink').attr("href", "http://www.cdep.ro/pls/parlam/structura2015.mp?idm=" + loadedIndividualData[nume].personId + "&cam=2&leg=2012");
         $('#deputyDetailsTab').fadeIn(500);
+        $('body').delay(10).animate({
+                    scrollTop: $("#deputyDetailsTab").offset().top},
+                'slow');
+        //alert($("#deputyDetailsTab").offset().top);
     }
-    function plot(nume) {
+
+    function plotParties(interval)
+    {
+
+        var message="în ultimele "+interval+" zile";
+        if (interval==-1)
+        message="de la începutul legislaturii"
+        var labelz=[]
+        var absenceRate = [];
+        var offset = 0;
+        var i=0;
+        $.each(loadedPartyData[interval], function (key, item) {
+            if (key.length<15) {
+                labelz.push([i, key]);
+                absenceRate.push([i,  Math.round(10.0*100.0 * (item.ABSENT.value / item.TOTAL.value))/10.0]);
+
+                i++;
+            }
+
+        });
+//        for (var i = 0; i < 10; i++) {
+//            absenceRate.push([i, Math.random()*100.0 ]);
+//            labels.push([i, "PSD"]);
+//        }
+
+        var options = {
+            series: {
+                bars: {show: true, fill: true, align:'center', barWidth:0.3}
+
+            },
+            xaxis: {
+                ticks: labelz
+
+            },
+            grid: {
+                hoverable: true //IMPORTANT! this is needed for tooltip to work
+            },
+            yaxis: {
+                min: 0.0,
+                max: 109.0
+            },
+            tooltip: true,
+            tooltipOpts: {
+                content: "Absență %y.1 %"+message,
+                shifts: {
+                    x: -60,
+                    y: 25
+                }
+            }
+
+        };
+
+        var plotObj = $.plot($("#flot-bar-chart"), [{
+                    data: absenceRate,
+                    label: "Rata medie de absență per partid ",
+                    color: "#AF0101"
+                }],
+                options);
+
+
+
+    }
+
+
+    function plotIndividual(nume) {
         var absenceRate = [];
         var offset = 0;
 //            for (var i = 0; i < 12; i += 0.2) {
@@ -380,7 +557,55 @@
         });
     }
 
-    function prepareData(res) {
+    function showGlobalStats(res) {
+        globalTotal = [];
+        globalAbsence = [];
+
+        globalTotal["30"] = 0;
+        globalTotal["90"] = 0;
+        globalTotal["365"] = 0;
+        globalTotal["all"] = 0;
+
+        globalAbsence["30"] = 0;
+        globalAbsence["90"] = 0;
+        globalAbsence["365"] = 0;
+        globalAbsence["all"] = 0;
+
+        $.each(res, function (key, item) {
+            if (item.active) {
+                globalAbsence["30"] += item.statsLast30Days.ABSENT.value;
+                globalTotal["30"] += item.statsLast30Days.TOTAL.value;
+
+                globalAbsence["90"] += item.statsLast90Days.ABSENT.value;
+                globalTotal["90"] += item.statsLast90Days.TOTAL.value;
+
+                globalAbsence["365"] += item.statsLast365Days.ABSENT.value;
+                globalTotal["365"] += item.statsLast365Days.TOTAL.value;
+
+                globalAbsence["all"] += item.statsAllTerm.ABSENT.value;
+                globalTotal["all"] += item.statsAllTerm.TOTAL.value;
+
+            }
+        });
+        var absence30 = Math.round(10.0 * 100.0 * globalAbsence["30"] / (globalTotal["30"] + epsilon)) / 10.0;
+        $('#global30').text(absence30 + "%");
+        $('#global30').css("color", ' rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')');
+
+        var absence90 = Math.round(10.0 * 100.0 * globalAbsence["90"] / (globalTotal["90"] + epsilon)) / 10.0;
+        $('#global90').text(absence90 + "%");
+        $('#global90').css("color", ' rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')');
+
+        var absence365 = Math.round(10.0 * 100.0 * globalAbsence["365"] / (globalTotal["365"] + epsilon)) / 10.0;
+        $('#global365').text(absence365 + "%");
+        $('#global365').css("color", ' rgb(' + Math.round(absence365 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence365 / 100.0) * maxBlue) + ')');
+
+        var absenceAll = Math.round(10.0 * 100.0 * globalAbsence["all"] / (globalTotal["all"] + epsilon)) / 10.0;
+        $('#globalAll').text(absenceAll + "%");
+        $('#globalAll').css("color", ' rgb(' + Math.round(absenceAll * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absenceAll / 100.0) * maxBlue) + ')');
+
+
+    }
+    function prepareIndividualData(res) {
         preparedIndividualData = [];
         $.each(res, function (key, item) {
             //console.info(item.fullName);
@@ -411,9 +636,10 @@
             }
         });
     }
+
     $(document).ready(function () {
 
-
+        var clipboardObject=new Clipboard('.btn');
         $.ajax({
             url: serviceURL + 'data/personStatsTogether.json',
             type: 'GET',
@@ -438,35 +664,86 @@
                 console.log("Error count: " + errorCount);
                 console.log("Last updated:" + lastUpdateDateTime);
                 console.log("Last update timestamp:" + lastUpdateTimestamp);
-                console.log("Number of profiles: " + res.payload.length);
+                console.log("Number of profiles: " + Object.keys(res.payload).length);
                 //alert("Loaded "+res.length);
-                prepareData(loadedIndividualData);
+                prepareIndividualData(loadedIndividualData);
                 renderTable();
+                showGlobalStats(loadedIndividualData);
+                try{
+                var inLinkName=parseParameter("deputat");
+                if (inLinkName)
+                {
+                    plotIndividual(inLinkName);
+                    profileData(inLinkName);
+                }
+                }
+                catch(err)
+                {
+                    console.error(err.message);
+                }
                 $('body').on('click', '.deputyDetailsLink', function () {
-                    //$('.classDetailsLink').click(function(event) {
                     var deputyName = event.target.attributes["deputyName"].nodeValue;
-                    plot(deputyName);
+                    plotIndividual(deputyName);
                     profileData(deputyName);
-                    //alert(deputyName.nodeValue);
+
 
                 });
-                //plot("Alexandru NAZARE");
             }
+        });
+
+
+        $.ajax({
+            url: serviceURL + 'data/partyStats.json',
+            type: 'GET',
+            async: true,
+            cache: true,
+            contentType: "application/json; charset=utf-8",
+            dataType: 'json',
+            error: function (xhr, ajaxOptions, thrownError) {
+                console.error(thrownError);
+            },
+            success: function (res) {
+                loadedPartyData=res;
+                console.log("Parties loaded: "+ Object.keys(res[-1]).length);
+                plotParties(-1);
+            }
+        });
+
+
+        $('#button-365').change(function () {
+           plotParties(365);
+        });
+
+        $('#button-30').change(function () {
+            plotParties(30);
+        });
+        $('#button-90').change(function () {
+            plotParties(90);
+        });
+        $('#button-all').change(function () {
+            plotParties(-1);
         });
 
     });
 </script>
-    <!-- GA Script -->
-    <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+<!-- GA Script -->
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
-        ga('create', 'UA-72169019-1', 'auto');
-        ga('send', 'pageview');
+    ga('create', 'UA-72169019-1', 'auto');
+    ga('send', 'pageview');
 
-    </script>
+</script>
 
 </body>
 
