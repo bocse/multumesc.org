@@ -15,6 +15,8 @@ import org.apache.commons.configuration.FileConfiguration;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.time.StopWatch;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,6 +39,7 @@ public class DeputyCrawler {
     public final Map<String, Map<VoteTypes, AtomicLong>> partyVotesAll = new ConcurrentHashMap<>();
     public final Map<String, Person> persons = new ConcurrentHashMap<>();
     public final SortedMap<Long, String> subjectMatters = new ConcurrentSkipListMap<>();
+    private  Map<Long, Long> personStartTimestampMap;
     private final String configFile;
     private final String stateFile;
     private final Object syncObject = new Object();
@@ -93,6 +96,8 @@ public class DeputyCrawler {
 
     public void crawl() throws IOException, InterruptedException, ConfigurationException {
         StopWatch crawlStopWatch=new StopWatch();
+        DeputyPresenceParser startDateParser=new DeputyPresenceParser();
+        personStartTimestampMap= startDateParser.getAllStartDates();
         crawlStopWatch.start();
         ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
         List<Future<Person>> futureList = Collections.synchronizedList(new ArrayList<Future<Person>>());
@@ -105,6 +110,20 @@ public class DeputyCrawler {
                     Person person = new Person();
                     person.setPersonId(personId);
                     deputyPresenceParser.getPersonProfile(person);
+                    Long investitureTimestamp=personStartTimestampMap.get(personId);
+                    if (investitureTimestamp==null)
+                    {
+                        if (person.getActive()) {
+                            logger.severe("SEVERE: failed to determine investiture date for active deputy " + personId);
+                        }
+                        else
+                        {
+                            logger.warning("Warning: failed to determine investiture date for non-active deputy " + personId);
+                            investitureTimestamp=new DateTime(2012,12,18,0,0).getMillis();
+                        }
+                    }
+                    person.setInvestitureTimestamp(investitureTimestamp);
+
                     deputyPresenceParser.getPersonVotes(person, subjectMatters);
 
                     synchronized (syncObject) {
@@ -212,6 +231,11 @@ public class DeputyCrawler {
         profileStatsTogetherWrapper.put("crawlTime", crawlStopWatch.getTime());
         profileStatsTogetherWrapper.put("successful", succesful);
         profileStatsTogetherWrapper.put("errorCount", exceptionsFound);
+        profileStatsTogetherWrapper.put("lastEventTimestamp", subjectMatters.lastKey());
+        profileStatsTogetherWrapper.put("firstEventTimestamp", subjectMatters.firstKey());
+        profileStatsTogetherWrapper.put("lastEventTimestamp", new DateTime(subjectMatters.lastKey()).toString());
+        profileStatsTogetherWrapper.put("firstEventTimestamp", new DateTime(subjectMatters.firstKey()).toString());
+
         profileStatsTogetherWrapper.put("payload", persons);
         File profileStatsTogetherFile=JsonSerializer.serialize(configuration.getString("output.profileStatsTogether.path")+fileSuffix, profileStatsTogetherWrapper);
         File partyStatsFile=new File(configuration.getString("output.partyStats.path")+fileSuffix);
@@ -227,6 +251,12 @@ public class DeputyCrawler {
             s3.upload(configuration.getString("upload.s3.remotePath") + partyStatsFile.getName(), partyStatsFile);
             s3.upload(configuration.getString("upload.s3.remotePath") + subjectFile.getName(), subjectFile);
 
+            DateTimeFormatter fmt = DateTimeFormat.forPattern("YYYY-MM-dd");
+            String strDateOnly = fmt.print(new DateTime());
+            s3.upload( configuration.getString("upload.s3.remotePath")+"history/"+strDateOnly+"/"+ profileStatsTogetherFile.getName(),profileStatsTogetherFile);
+            s3.upload(configuration.getString("upload.s3.remotePath") +"history/"+strDateOnly+"/"+ partyStatsFile.getName(), partyStatsFile);
+            s3.upload(configuration.getString("upload.s3.remotePath") +"history/"+strDateOnly+"/"+ subjectFile.getName(), subjectFile);
+            ;
         }
 
         if (configuration.getBoolean("upload.ftp.enabled", false))

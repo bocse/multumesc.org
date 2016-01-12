@@ -92,7 +92,7 @@
 
         </nav>
 
-        <div id="page-wrapper">
+        <div id="page-wrapper" id="general">
             <div class="row">
                 <div class="col-lg-10 pull-right">
                     <h1 class="page-header">Despre Mulțumesc.org</h1>
@@ -120,7 +120,7 @@
                 <!-- /.col-lg-12 -->
             </div>
 
-            <div class="row">
+            <div class="row" id="de-ce-multumesc">
                 <div class="col-lg-10">
                     <h1 class="page-header">De ce ”Mulțumesc”?</h1>
                     <p>Pentru ca suntem ironici. Și credem că mulți dintre reprezentații noștrii merită orice altceva în afara de mulțumiri.</p>
@@ -136,7 +136,7 @@
                 <!-- /.col-lg-12 -->
             </div>
 
-            <div class="row">
+            <div class="row" id="cine-suntem">
                 <div class="col-lg-10 pull-right">
                     <h1 class="page-header">Cine suntem noi?</h1>
                     <p>Mă numesc <a href="http://ro.linkedin.com/in/bogdanbocse" target="_blank">Bogdan Bocșe</a> și sunt inițiatorul acestui proiect. poți găsi mai multe informații despre mine pe <a href="http://ro.linkedin.com/in/bogdanbocse" target="_blank"> LinkedIn </a> și <a href="http://bogdanbocse.com" target="_blank">pe blog-ul meu</a>. Restul contribuitorilor doresc să rămână anonimi.</p>
@@ -157,7 +157,7 @@
                 <!-- /.col-lg-12 -->
             </div>
 
-            <div class="row">
+            <div class="row" id="statistici-senatori">
                 <div class="col-lg-10">
                     <h1 class="page-header">De ce nu și statistici despre senatori?</h1>
                     <p>Metodele și algoritmii pentru evaluarea și calcularea gradului de prezență al senatorilor sunt similare, motiv pentru care metoda ar putea fi cu ușurință aplicată și pentru analiza datelor disponibile pe <a href="http://senat.ro" target="_blank"> site-ul Senatului</a>.</p>
@@ -173,7 +173,7 @@
                     <p>Problema site-ului Senat.ro se manifestă atunci când există două, trei sau mai multe cereri în paralel. Operațiile de lock făcute se interpun, creând situația unui dead lock (blocaj între bariere de access exclusiv interdependente). Serverul de aplicație este forțat să respingă/refuze majoritatea cererilor primite concomitent (în general refuzând toate mai puțin una dintre cererile făcute concomitent) pentru a debloca lock-urile interdependente.</p>
                     <p>Pentru servirea datelor pe un site, nu este necesară folosirea lock-urilor, pentru că utilizatorii publici nu pot modifica/scrie date în site - ceea ce face lock-urile nenecesare. Eliminarea lock-urilor în acest caz ar rezolva problema. Suplimentar, ținând cont ca datele se modifică relativ rar (poate de câteva ori pe zi), performanța site-ul ar putea fi și mai mult îmbunătățită de un sistem de caching la nivel de pagină sau la nivel de bază de date, ceea ce ar degreva operațiile realizate de server și ar produce timp de răspuns mai buni.</p>
                     </i>
-
+                    <p><img style="alignment: center;" alt="Eroarea afișată pe pagina Senat.ro la mai mult de 3 accesari concomitente" src="images/eroare-senat.jpg"></p>
                     <p>Dacă echipa tehnică de la Senat va avea nevoie de ajutor în rezolvarea acestei probleme, vom oferi acest ajutor în întreaga măsură a competențelor noastre.</p>
                 </div>
 

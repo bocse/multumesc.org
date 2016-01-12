@@ -29,6 +29,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -78,6 +79,17 @@ public class DeputyPresenceParser {
     }
     //http://www.cdep.ro/pls/steno/evot2015.mp?idm=8&tot=1&pag=3
 
+    private HttpUriRequest createStartDateRequestDocument()
+    {
+        final String url = "http://www.cdep.ro/pls/parlam/structura2015.de?idl=1";
+        final HttpGet httpGet = new HttpGet(url);
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(connectionRequestTimeout).setConnectTimeout(connectionTimeout).setSocketTimeout(socketTimeout).build();
+        httpGet.setConfig(requestConfig);
+        logger.info("Executing request " + httpGet.getRequestLine() );
+        return httpGet;
+
+    }
     private HttpUriRequest createVoteNewRequestDocument(final Long personId, final Long eventId) throws UnsupportedEncodingException {
         final String url = "http://www.cdep.ro/pls/steno/evot2015.mp?";
         List<NameValuePair> nameValuePairs = new ArrayList<>(10);
@@ -149,7 +161,7 @@ public class DeputyPresenceParser {
         Long foundElements=0L;
         Long parsingErrors=0L;
         //Elements elements=doc.select("#pageContent > table:last-child > tbody > tr");
-
+        Long votesBeforeInvestiture=0L;
         //
         Elements elements=doc.select("#olddiv > table > tbody:eq(0) > tr");
         for (int elementIndex=1; elementIndex<elements.size(); elementIndex++ ) {
@@ -171,8 +183,18 @@ public class DeputyPresenceParser {
                     if (!subjectMatters.containsKey(vote.getSubjectMatterId())) {
                         subjectMatters.put(vote.getSubjectMatterId(), parts.get(3).text().trim());
                     }
-                    person.getVoteMap().put(vote.getSubjectMatterId(), vote);
-                    foundElements++;
+                    if (person.getInvestitureTimestamp() == null)
+                    {
+                        throw new IllegalStateException("Unable to determine investiture timestamp for "+person.getPersonId());
+                    }
+                    if (person.getInvestitureTimestamp()<= vote.getTimestamp()) {
+                        person.getVoteMap().put(vote.getSubjectMatterId(), vote);
+                        foundElements++;
+                    }
+                    else
+                    {
+                        votesBeforeInvestiture++;
+                    }
                 }
                 catch(Exception ex)
                 {
@@ -190,6 +212,10 @@ public class DeputyPresenceParser {
         }
         if (parsingErrors>0)
         logger.info("Parsing errors: "+parsingErrors);
+        if (votesBeforeInvestiture>0)
+        {
+            logger.warning("Ignored "+votesBeforeInvestiture+" votes before investiture.");
+        }
         return foundElements;
     }
 
@@ -399,6 +425,44 @@ public class DeputyPresenceParser {
         return foundElements;
     }
 
+    public Document getAllStartDateDocument() throws IOException, InterruptedException {
+        return HttpRequester.getDocument(createStartDateRequestDocument());
+    }
+    public Map<Long,Long> getAllStartDates() throws IOException, InterruptedException {
+        Document doc=getAllStartDateDocument();
+        Map<Long, Long> personStartTimestamp=new HashMap<>();
+        Elements elements=doc.select("#content > div > div.content-right > div > div.program-lucru-detalii.clearfix > div:nth-child(2) > table > tbody > tr");
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd.MM.yyyy");
+        for(Element element:elements)
+        {
+            Elements subelements=element.select("td");
+            String startDateString=subelements.get(subelements.size()-1).text().trim();
+            //19.12.2012 13:41
+            DateTime startDate=new DateTime(2012,12,18,0,0);
+            if (!startDateString.isEmpty())
+            startDate=formatter.parseDateTime(startDateString);
+            String url=subelements.get(1).child(0).child(0).attr("href").trim();
+            if (url.isEmpty()) {
+                logger.warning("Cannot find profile URL:"+element.text());
+                continue;
+            }
+            Map<String, String> urlParts=TextUtils.splitQuery(new URL("http://cdep.ro"+url));
+            Long deputyId=-1L;
+            try{
+                String idm=urlParts.get("idm");
+                deputyId=Long.valueOf(idm);
+
+            }
+            catch (NumberFormatException nfex)
+            {
+                logger.warning("Unable to parser idm:"+element.text());
+                continue;
+            }
+            personStartTimestamp.put(deputyId, startDate.getMillis());
+            logger.info(deputyId+ " "+startDate);
+        }
+        return personStartTimestamp;
+    }
 
     public void getPersonVotes(Person person,  Map<Long, String> subjectMatters) throws IOException, InterruptedException {
 

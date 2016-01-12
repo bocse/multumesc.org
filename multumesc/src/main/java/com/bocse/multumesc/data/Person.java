@@ -15,6 +15,7 @@ public class Person  {
     private String pictureURL;
     private String currentParty;
     private String email;
+    private Long investitureTimestamp=-1L;
     private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
 
@@ -208,5 +209,15 @@ public class Person  {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Long getInvestitureTimestamp() {
+        return investitureTimestamp;
+    }
+
+    public void setInvestitureTimestamp(Long investitureTimestamp) {
+        if (investitureTimestamp==null)
+            throw new IllegalStateException("Investiture date cannot be null");
+        this.investitureTimestamp = investitureTimestamp;
     }
 }

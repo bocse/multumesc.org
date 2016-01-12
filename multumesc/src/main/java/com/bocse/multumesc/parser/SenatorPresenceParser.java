@@ -172,8 +172,8 @@ public class SenatorPresenceParser {
         Elements elements=doc.select("#ctl00_B_Center_VoturiPlen1_GridVoturi > tbody > tr");
         if (elements.size()==0)
             return;
-        //PrintWriter writer = new PrintWriter("/home/bocse/senat/"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
-        PrintWriter writer = new PrintWriter("C://Temp//Senat//"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
+        PrintWriter writer = new PrintWriter("/home/bocse/senat/"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
+        //PrintWriter writer = new PrintWriter("C://Temp//Senat//"+person.getPersonId()+"_"+person.getFullName()+"_"+setYear+"_"+setMonth+"_"+setDate.getDayOfMonth()+".txt", "UTF-8");
 
 
         for (Element element: elements)
