@@ -109,7 +109,7 @@
 
                      <p>   Spre deosebire de datele prezente pe site-ul forului legislativ, unde pentru fiecare pereche deputat-element de pe ordinea de zi a plenului este notată starea DA, NU, ABȚINERE, ABSENT - datele prezentate pe site-ul nostru prezintă procentul de elemente la care deputatul a votat DA, NU sau ABȚINERE (adică a fost prezent). Prin aceasta, noi și dumneavoastră putem observa în ce măsură procentuală respectivul deputat, de-a lungul timpul, fost prezent și suficient de atent/interesat pentru a-și exprima votul sau respectiv a fost absent.</p>
 
-                     <p>   Statisticile pe care algoritmul nostru le calculează, ca și însăși procesul democratic, se bazează pe corectitudinea și intergritatea informațiilor disponibile pe site-ul Camerei Deputaților. Potențiale erori sau omisiuni din datele prezentate pe site-ul lor se vor reflecta în incorectitudini ale statisticilor noastre. Corectarea datelor la sursa va produce corectarea statisticilor prezentate, întrucât algoritmul nostru reevaluează periodic (saptămânal sau mai des) datele.</p>
+                     <p>   Statisticile pe care algoritmul nostru le calculează, ca și însăși procesul democratic, se bazează pe corectitudinea și integritatea informațiilor disponibile pe site-ul Camerei Deputaților. Potențiale erori sau omisiuni din datele prezentate pe site-ul lor se vor reflecta în incorectitudini ale statisticilor noastre. Corectarea datelor la sursa va produce corectarea statisticilor prezentate, întrucât algoritmul nostru reevaluează periodic (saptămânal sau mai des) datele.</p>
 
                      <p>   În ciuda celor mai sincere intenții ale noastre și a eforturilor noastre de a testa și valida funcționarea corectă a algoritmului, există posibilitatea să existe erori minore în interpretarea datelor. Dacă observați vreo astfel de eroare, omisiune sau orice altă neconcordanță cu datele prezentate pe site-ul Camerei Deputaților, vă rugăm să ne atrageți atenția pentru a face modificările necesare corectării deîndată.</p>
 
@@ -157,6 +157,7 @@
                 <!-- /.col-lg-12 -->
             </div>
 
+
             <div class="row" id="statistici-senatori">
                 <div class="col-lg-10">
                     <h1 class="page-header">De ce nu și statistici despre senatori?</h1>
@@ -179,8 +180,30 @@
 
                 <!-- /.col-lg-12 -->
             </div>
+
+            <div class="row" id="cum-calculam">
+                <div class="col-lg-10">
+                    <h1 class="page-header">Cum calculăm statisticile de absență pentru deputați?</h1>
+                    <p>Pentru a asigura un nivel cât mai mare de transparență a algoritmului de calcul a statisticilor și pentru a evita confuziile vrem să facem următoarele precizări: </p>
+                    <ul>
+                        <li>Datele de referință sunt preluate zilnic de pe site-ul Camerei Deputaților (cdep.ro), secțiunea Vot Electronic respectiv de pe profilul fiecărui deputat</li>
+                        <li>Din informațiile pe care le avem, în secțiunea ”Votul Electronic” de pe profilul fiecărui deputat nu apar elemente de pe ordinea de zi a comisiilor sau a ședințelor comune cu Senatul. Așadar, gradul de absență publicat de Multumesc.org nu e reprezentativ pentru astfel de ședințe.</li>
+                        <li>Considerăm datele din secțiunea ”Vot Electronic” ca fiind corecte și complete. Nu ne putem asuma răspundere pentru erori sau omisiuni în datele publicate de cdep.ro</li>
+                        <li>Pentru intervalele de referință 30 de zile, 90 de zile, 365 de zile  ne referim la zile calendaristice. Astfel, dacă într-un interval de 30 de zile, Camera Deputaților a raportat voturile la doar 10 elemente de pe ordinea de zi, Multumesc.org va arăta rata de absență la acele evenimente</li>
+                        <li>Dacă într-un interval de referință 30 de zile, 90 de zile, 365 de zile nu există niciun eveniment publicat în secțiunea de Vot Electronic a profilului deputaților pe site-ul cdep.ro, vom afișa simbolul ”n/a” (din engleză, ”not applicable”), cu semnificația că nu se poate determina absența pe acea perioada. </li>
+                        <li>Site-ul Camera Deputaților nu publică informații despre prezența electronică (a nu se confunda cu ”Votul Electronic”), ceea ce înseamnă Multumesc.org nu poate avea acces spre a prelucra aceste informații. </li>
+                        <li>Activitatea deputaților care au schimbat partidul în timpul mandatului este atribuită partidului din care fac parte în prezent (pentru statisticile pe partide)</li>
+                        <li>Deputații care nu mai sunt în funcție (demisie, demitere, condamnare, deces etc) nu se găsesc pe listă.</li>
+                        <li>Săptămânile în care Camera Deputaților nu a avut activitate de plen NU sunt reprezentate pe graficul săptămânal și NU se consideră absență.</li>
+                    </ul>
+                </div>
+
+                <!-- /.col-lg-12 -->
+            </div>
+
+
             <!-- /.row -->
-            <div class="fb-comments" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
+            <div class="fb-comments" order_by="reverse_time" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
         </div>
         <!-- /#page-wrapper -->
 

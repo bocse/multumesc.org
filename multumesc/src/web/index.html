@@ -162,6 +162,7 @@
                                 </tbody>
                             </table>
                         </div>
+                        <p>Aceste statistici reflectă doar activitatea plenară a Camerei Deputaților, în ședinele necomune cu Senatul. Detalii despre metoda de calcul găsiți <a href="despre.html#cum-calculam" target="_blank">aici.</a></p>
                         <p> Ultima actualizare a site-ului nostru: <label id="lastUpdateDateTime"></label></p>
                         <p><i>* Deputații care nu mai sunt în funcție nu se găsesc pe listă.</i></p>
                     </div>
@@ -310,7 +311,7 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <div class="fb-comments" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
+            <div class="fb-comments" order_by="reverse_time" data-href="http://multumesc.org" data-width="800" data-numposts="25"></div>
         </div>
     </div>
 </div>
@@ -380,14 +381,27 @@
             $('#emailInfo').text("nu e disponibilă");
         $('#county').text(capitalizeFirstLetter(item.county));
         $('#colegiu').text(item.colegiu);
-        var absence30 = Math.round(10.0 * 100.0 * item.statsLast30Days.ABSENT.value / (item.statsLast30Days.TOTAL.value + epsilon)) / 10.0;
-        var absence90 = Math.round(10.0 * 100.0 * item.statsLast90Days.ABSENT.value / (item.statsLast90Days.TOTAL.value + epsilon)) / 10.0;
+        if (item.statsLast30Days.TOTAL.value >0) {
+            var absence30 = Math.round(10.0 * 100.0 * item.statsLast30Days.ABSENT.value / (item.statsLast30Days.TOTAL.value + epsilon)) / 10.0;
+            $('#absence30').text(absence30 + "%");
+            $('#absence30').css("color", ' rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')');
+        }
+        else
+        {
+            $('#absence30').text("n/a");
+        }
+
+        if (item.statsLast90Days.TOTAL.value > 0) {
+            var absence90 = Math.round(10.0 * 100.0 * item.statsLast90Days.ABSENT.value / (item.statsLast90Days.TOTAL.value + epsilon)) / 10.0;
+            $('#absence90').text(absence90 + "%");
+            $('#absence90').css("color", ' rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')');
+        }
+        else
+        {
+            $('#absence30').text("n/a");
+        }
         var absence365 = Math.round(10.0 * 100.0 * item.statsLast365Days.ABSENT.value / (item.statsLast365Days.TOTAL.value + epsilon)) / 10.0;
         var absenceAllTerm = Math.round(10.0 * 100.0 * item.statsAllTerm.ABSENT.value / (item.statsAllTerm.TOTAL.value + epsilon)) / 10.0;
-        $('#absence30').text(absence30 + "%");
-        $('#absence30').css("color", ' rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')');
-        $('#absence90').text(absence90 + "%");
-        $('#absence90').css("color", ' rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')');
         $('#absence365').text(absence365 + "%");
         $('#absence365').css("color", ' rgb(' + Math.round(absence365 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence365 / 100.0) * maxBlue) + ')');
         $('#absenceAllTerm').text(absenceAllTerm + "%");
@@ -587,14 +601,26 @@
 
             }
         });
-        var absence30 = Math.round(10.0 * 100.0 * globalAbsence["30"] / (globalTotal["30"] + epsilon)) / 10.0;
-        $('#global30').text(absence30 + "%");
-        $('#global30').css("color", ' rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')');
-
-        var absence90 = Math.round(10.0 * 100.0 * globalAbsence["90"] / (globalTotal["90"] + epsilon)) / 10.0;
-        $('#global90').text(absence90 + "%");
-        $('#global90').css("color", ' rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')');
-
+        if (globalTotal["30"] > 0)
+        {
+            var absence30 = Math.round(10.0 * 100.0 * globalAbsence["30"] / (globalTotal["30"] + epsilon)) / 10.0;
+            $('#global30').text(absence30 + "%");
+            $('#global30').css("color", ' rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')');
+        }
+        else
+        {
+            $('#global30').text("n/a");
+        }
+        if (globalTotal["90"]>0)
+        {
+            var absence90 = Math.round(10.0 * 100.0 * globalAbsence["90"] / (globalTotal["90"] + epsilon)) / 10.0;
+            $('#global90').text(absence90 + "%");
+            $('#global90').css("color", ' rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')');
+        }
+        else
+        {
+            $('#global90').text("n/a");
+        }
         var absence365 = Math.round(10.0 * 100.0 * globalAbsence["365"] / (globalTotal["365"] + epsilon)) / 10.0;
         $('#global365').text(absence365 + "%");
         $('#global365').css("color", ' rgb(' + Math.round(absence365 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence365 / 100.0) * maxBlue) + ')');
@@ -620,12 +646,25 @@
                     localCandidate.push(item.colegiu);
                 else
                     localCandidate.push("-");
+
+                if (item.statsLast30Days.TOTAL.value>0)
+                {
                 var absence30 = Math.round(10.0 * 100.0 * item.statsLast30Days.ABSENT.value / item.statsLast30Days.TOTAL.value) / 10.0;
                 localCandidate.push('<span style="color: rgb(' + Math.round(absence30 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence30 / 100.0) * maxBlue) + ')">' + absence30 + '%</span>');
-
+                }
+                else
+                {
+                    localCandidate.push('<span>n/a</span>');
+                }
+                if (item.statsLast90Days.TOTAL.value>0)
+                {
                 var absence90 = Math.round(10.0 * 100.0 * item.statsLast90Days.ABSENT.value / item.statsLast90Days.TOTAL.value) / 10.0;
                 localCandidate.push('<span style="color: rgb(' + Math.round(absence90 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence90 / 100.0) * maxBlue) + ')">' + absence90 + '%</span>');
-
+                }
+                else
+                {
+                    localCandidate.push('<span>n/a</span>');
+                }
                 var absence365 = Math.round(10.0 * 100.0 * item.statsLast365Days.ABSENT.value / item.statsLast365Days.TOTAL.value) / 10.0;
                 localCandidate.push('<span style="color: rgb(' + Math.round(absence365 * maxRed / 100.0) + ', 0, ' + Math.round((1.0 - absence365 / 100.0) * maxBlue) + ')">' + absence365 + '%</span>');
 
