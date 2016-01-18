@@ -219,6 +219,104 @@ public class DeputyPresenceParser {
         return foundElements;
     }
 
+    public Map<String, Set<String>> parseCircumscriptionDocumentToHierarchy(Document doc, String county, Long circumscription, Long colegiu) {
+
+        Map<String, Set<String>> localityMap=new HashMap<>();
+        if (doc == null)
+            return localityMap;
+        String locality=county;
+        Elements elements = doc.select("body > div > div > table > tbody > tr:eq(4) > td > p");
+        for (int elementIndex=1; elementIndex<elements.size(); elementIndex++){
+            Element element=elements.get(elementIndex);
+            String text = TextUtils.flattenToAscii(element.text()).toLowerCase();
+
+            String[] parts = text.split(":");
+            if (parts.length > 1) {
+                if (parts[0].contains("sat")) {
+
+                    String[] sate = parts[1].split(",");
+                    for (String sat : sate) {
+                        Location location = new Location();
+                        location.setCounty(county);
+                        location.setCircumscription(circumscription);
+                        location.setColegiu(colegiu);
+                        location.setName(sat);
+                        location.setLocationType(LocationType.SAT);
+                        locality=location.getName();
+                        localityMap.putIfAbsent(locality, new HashSet<>());
+                    }
+                } else if (parts[0].contains("localitate componenta") || parts[0].contains("localitati componente")) {
+
+                    String[] comune = parts[1].split(",");
+                    for (String comuna : comune) {
+                        Location location = new Location();
+                        location.setCounty(county);
+                        location.setCircumscription(circumscription);
+                        location.setColegiu(colegiu);
+                        location.setName(comuna);
+                        location.setLocationType(LocationType.COMUNA);
+                        locality=location.getName();
+                        localityMap.putIfAbsent(locality, new HashSet<>());
+                    }
+                } else {
+                    Location location = new Location();
+                    location.setCounty(county);
+                    location.setCircumscription(circumscription);
+                    location.setColegiu(colegiu);
+                    location.setName(text);
+                    location.setLocationType(LocationType.NA);
+                    //locations.add(location);
+                    logger.warning("Unknown location type" + text);
+                }
+            } else {
+                if (parts[0].contains("comuna ")) {
+                    Location location = new Location();
+                    location.setCounty(county);
+                    location.setCircumscription(circumscription);
+                    location.setColegiu(colegiu);
+                    location.setName(parts[0].replace("comuna ", ""));
+                    location.setLocationType(LocationType.COMUNA);
+                    locality=location.getName();
+                    localityMap.putIfAbsent(locality, new HashSet<>());
+                }
+                else
+                if (parts[0].contains("municipiul ") || parts[0].contains("orasul")) {
+                    Location location = new Location();
+                    location.setCounty(county);
+                    location.setCircumscription(circumscription);
+                    location.setColegiu(colegiu);
+                    location.setName(parts[0].replace("municipiul ", ""));
+                    location.setLocationType(LocationType.MUNICIPIU);
+                    //locations.add(location);
+                    locality=location.getName();
+                    localityMap.putIfAbsent(locality, new HashSet<>());
+                }
+                else {
+                    if (parts[0]!=null && !parts[0].isEmpty()) {
+                        Location location = new Location();
+                        location.setCounty(county);
+                        location.setCircumscription(circumscription);
+                        location.setColegiu(colegiu);
+                        location.setName(parts[0]);
+                        if (county.equals("STRAINATATE")) {
+                            location.setLocationType(LocationType.TARA);
+                            locality=location.getName();
+                            localityMap.putIfAbsent(locality, new HashSet<>());
+                        }
+                        else {
+                            localityMap.putIfAbsent(locality, new HashSet<>());
+                            localityMap.get(locality).add(location.getName());
+                        }
+                        //locations.add(location);
+
+                    }
+                }
+            }
+
+
+        }
+        return localityMap;
+    }
     public List<Location> parseCircumscriptionDocument(Document doc, String county, Long circumscription, Long colegiu) {
         List<Location> locations = new ArrayList<>();
         if (doc == null)
@@ -489,6 +587,37 @@ public class DeputyPresenceParser {
         countiesFlattened.add("STRAINATATE");
         return getAllCircumscriptions(countiesFlattened);
 
+    }
+
+
+    public Map<String, Map<Long, Map<String, Set<String>>>> getCircumscriptionsHierarchy(List<String> countiesFlattened) throws IOException, InterruptedException {
+        Counties counties=new Counties();
+        //county -> circumscription -> town -> streets[]
+        Map<String, Map<Long, Map<String, Set<String>>>> fullMap=new HashMap<>();
+
+        for (String county : countiesFlattened) {
+            Long circumscription = counties.getCircumscription(county);
+            //circumscription -> locality -> streets[]
+            Map<Long, Map<String, Set<String>>> circumscriptionMap=new HashMap<>();
+            boolean somethingSet=false;
+            for (long colegiu = 1L; colegiu < 50; colegiu++) {
+                Map<String, Set<String>>  localityMap=new HashMap<>();
+
+                localityMap.putAll(parseCircumscriptionDocumentToHierarchy(getCircumscriptionDocument(county.toUpperCase().replace("-", "%20"), colegiu, "CD"), county, circumscription, colegiu));
+                localityMap.putAll(parseCircumscriptionDocumentToHierarchy(getCircumscriptionDocument(county.toUpperCase().replace("-", "%20"), colegiu, "C"), county, circumscription, colegiu));
+
+                if (localityMap.size()>0) {
+                    circumscriptionMap.put(colegiu, localityMap);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            fullMap.put(county, circumscriptionMap);
+        }
+        return fullMap;
     }
     public List<Location> getAllCircumscriptions(List<String> countiesFlattened) throws IOException, InterruptedException {
         Counties counties=new Counties();
