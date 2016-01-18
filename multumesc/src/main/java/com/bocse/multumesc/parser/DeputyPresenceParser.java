@@ -219,93 +219,59 @@ public class DeputyPresenceParser {
         return foundElements;
     }
 
-    public Map<String, Set<String>> parseCircumscriptionDocumentToHierarchy(Document doc, String county, Long circumscription, Long colegiu) {
+    public Map<String, SortedSet<String>> parseCircumscriptionDocumentToHierarchy(Document doc,  String county) {
 
-        Map<String, Set<String>> localityMap=new HashMap<>();
+        SortedMap<String, SortedSet<String>> localityMap=new TreeMap<>();
         if (doc == null)
             return localityMap;
-        String locality=county;
+        String locality="";
         Elements elements = doc.select("body > div > div > table > tbody > tr:eq(4) > td > p");
         for (int elementIndex=1; elementIndex<elements.size(); elementIndex++){
             Element element=elements.get(elementIndex);
             String text = TextUtils.flattenToAscii(element.text()).toLowerCase();
 
             String[] parts = text.split(":");
-            if (parts.length > 1) {
+            if (parts.length > 1 && !text.contains("blocuri") && !text.contains("str.")) {
                 if (parts[0].contains("sat")) {
 
                     String[] sate = parts[1].split(",");
                     for (String sat : sate) {
-                        Location location = new Location();
-                        location.setCounty(county);
-                        location.setCircumscription(circumscription);
-                        location.setColegiu(colegiu);
-                        location.setName(sat);
-                        location.setLocationType(LocationType.SAT);
-                        locality=location.getName();
-                        localityMap.putIfAbsent(locality, new HashSet<>());
+                        locality=sat.trim();
+                        localityMap.putIfAbsent(locality, new TreeSet<>());
                     }
                 } else if (parts[0].contains("localitate componenta") || parts[0].contains("localitati componente")) {
 
                     String[] comune = parts[1].split(",");
                     for (String comuna : comune) {
-                        Location location = new Location();
-                        location.setCounty(county);
-                        location.setCircumscription(circumscription);
-                        location.setColegiu(colegiu);
-                        location.setName(comuna);
-                        location.setLocationType(LocationType.COMUNA);
-                        locality=location.getName();
-                        localityMap.putIfAbsent(locality, new HashSet<>());
+                        locality=comuna.trim();
+                        localityMap.putIfAbsent(locality, new TreeSet<>());
                     }
                 } else {
-                    Location location = new Location();
-                    location.setCounty(county);
-                    location.setCircumscription(circumscription);
-                    location.setColegiu(colegiu);
-                    location.setName(text);
-                    location.setLocationType(LocationType.NA);
-                    //locations.add(location);
-                    logger.warning("Unknown location type" + text);
+                    logger.warning("Unknown location type, assuming street level" + text);
+                    localityMap.putIfAbsent(locality, new TreeSet<>());
+                    localityMap.get(locality).add(parts[0].trim());
                 }
             } else {
                 if (parts[0].contains("comuna ")) {
-                    Location location = new Location();
-                    location.setCounty(county);
-                    location.setCircumscription(circumscription);
-                    location.setColegiu(colegiu);
-                    location.setName(parts[0].replace("comuna ", ""));
-                    location.setLocationType(LocationType.COMUNA);
-                    locality=location.getName();
-                    localityMap.putIfAbsent(locality, new HashSet<>());
+                    locality=parts[0].replace("comuna ", "").trim();
+                    localityMap.putIfAbsent(locality, new TreeSet<>());
                 }
                 else
                 if (parts[0].contains("municipiul ") || parts[0].contains("orasul")) {
-                    Location location = new Location();
-                    location.setCounty(county);
-                    location.setCircumscription(circumscription);
-                    location.setColegiu(colegiu);
-                    location.setName(parts[0].replace("municipiul ", ""));
-                    location.setLocationType(LocationType.MUNICIPIU);
-                    //locations.add(location);
-                    locality=location.getName();
-                    localityMap.putIfAbsent(locality, new HashSet<>());
+                    locality=parts[0].replace("municipiul ", "").trim();
+                    localityMap.putIfAbsent(locality, new TreeSet<>());
                 }
                 else {
                     if (parts[0]!=null && !parts[0].isEmpty()) {
-                        Location location = new Location();
-                        location.setCounty(county);
-                        location.setCircumscription(circumscription);
-                        location.setColegiu(colegiu);
-                        location.setName(parts[0]);
+
                         if (county.equals("STRAINATATE")) {
-                            location.setLocationType(LocationType.TARA);
-                            locality=location.getName();
-                            localityMap.putIfAbsent(locality, new HashSet<>());
+
+
+                            localityMap.putIfAbsent(parts[0].trim(), new TreeSet<>());
                         }
                         else {
-                            localityMap.putIfAbsent(locality, new HashSet<>());
-                            localityMap.get(locality).add(location.getName());
+                            localityMap.putIfAbsent(locality.trim(), new TreeSet<>());
+                            localityMap.get(locality).add(parts[0].trim());
                         }
                         //locations.add(location);
 
@@ -590,21 +556,21 @@ public class DeputyPresenceParser {
     }
 
 
-    public Map<String, Map<Long, Map<String, Set<String>>>> getCircumscriptionsHierarchy(List<String> countiesFlattened) throws IOException, InterruptedException {
+    public SortedMap<String, SortedMap<Long, SortedMap<String, SortedSet<String>>>> getCircumscriptionsHierarchy(List<String> countiesFlattened) throws IOException, InterruptedException {
         Counties counties=new Counties();
         //county -> circumscription -> town -> streets[]
-        Map<String, Map<Long, Map<String, Set<String>>>> fullMap=new HashMap<>();
+        SortedMap<String, SortedMap<Long, SortedMap<String, SortedSet<String>>>> fullMap=new TreeMap<>();
 
         for (String county : countiesFlattened) {
             Long circumscription = counties.getCircumscription(county);
             //circumscription -> locality -> streets[]
-            Map<Long, Map<String, Set<String>>> circumscriptionMap=new HashMap<>();
-            boolean somethingSet=false;
-            for (long colegiu = 1L; colegiu < 50; colegiu++) {
-                Map<String, Set<String>>  localityMap=new HashMap<>();
+            SortedMap<Long, SortedMap<String, SortedSet<String>>> circumscriptionMap=new TreeMap<>();
 
-                localityMap.putAll(parseCircumscriptionDocumentToHierarchy(getCircumscriptionDocument(county.toUpperCase().replace("-", "%20"), colegiu, "CD"), county, circumscription, colegiu));
-                localityMap.putAll(parseCircumscriptionDocumentToHierarchy(getCircumscriptionDocument(county.toUpperCase().replace("-", "%20"), colegiu, "C"), county, circumscription, colegiu));
+            for (long colegiu = 1L; colegiu < 50; colegiu++) {
+                SortedMap<String, SortedSet<String>>  localityMap=new TreeMap<>();
+
+                localityMap.putAll(parseCircumscriptionDocumentToHierarchy(getCircumscriptionDocument(county.toUpperCase().replace("-", "%20"), colegiu, "CD"), county));
+                localityMap.putAll(parseCircumscriptionDocumentToHierarchy(getCircumscriptionDocument(county.toUpperCase().replace("-", "%20"), colegiu, "C"), county));
 
                 if (localityMap.size()>0) {
                     circumscriptionMap.put(colegiu, localityMap);

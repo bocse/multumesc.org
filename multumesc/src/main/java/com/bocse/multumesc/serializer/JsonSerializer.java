@@ -10,6 +10,9 @@ import java.io.*;
  */
 public class JsonSerializer {
     public static File serialize(String path,  Object object) throws IOException {
+       return serialize(path, object, false);
+    }
+        public static File serialize(String path,  Object object, boolean pretty) throws IOException {
 
 
         File file = new File(path);
@@ -20,7 +23,12 @@ public class JsonSerializer {
         }
 
         FileOutputStream fos=new FileOutputStream(file);
-        Gson gson = new GsonBuilder().create();
+        Gson gson;
+        if (pretty)
+        gson = new GsonBuilder().setPrettyPrinting().create();
+        else
+            gson = new GsonBuilder().create();
+
         String jsonString=gson.toJson(object);
 
         byte[] latin2JsonString =  jsonString.getBytes("UTF-8");

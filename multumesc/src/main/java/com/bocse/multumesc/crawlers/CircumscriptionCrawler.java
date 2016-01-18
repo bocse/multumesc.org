@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 public class CircumscriptionCrawler {
     private final static Logger logger = Logger.getLogger(MultumescDeputyParallelMain.class.toString());
     public final FileConfiguration configuration = new PropertiesConfiguration();
-
+    private final String fileSuffix=".json";
     private final String configFile;
 
     public CircumscriptionCrawler(String configFile) {
@@ -47,13 +47,13 @@ public class CircumscriptionCrawler {
 
     public void crawl() throws IOException, InterruptedException, ConfigurationException {
         DeputyPresenceParser pp=new DeputyPresenceParser();
-        //List<String> counties=new ArrayList<>();
-        //counties.add("CLUJ");
         Counties counties=new Counties();
         List<String> countiesFlattened=counties.getCountiesFlattened();
         countiesFlattened.add("STRAINATATE");
-        Map<String, Map<Long, Map<String, Set<String>>>> fullMap=pp.getCircumscriptionsHierarchy(countiesFlattened);
-        JsonSerializer jsonSerializer=new JsonSerializer();
-        JsonSerializer.serialize("C:\\Temp\\countyList" + ".txt", fullMap);
+        SortedMap<String, SortedMap<Long, SortedMap<String, SortedSet<String>>>> fullMap=pp.getCircumscriptionsHierarchy(countiesFlattened);
+        //JsonSerializer jsonSerializer=new JsonSerializer();
+        JsonSerializer.serialize(configuration.getString("output.circumscription.path") + fileSuffix, fullMap, true);
+        JsonSerializer.serialize(configuration.getString("output.circumscription.path") + ".min"+fileSuffix, fullMap);
+
     }
 }
