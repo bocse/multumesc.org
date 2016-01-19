@@ -45,6 +45,7 @@ public class DeputyCrawler {
     private final Object syncObject = new Object();
     public Long maxPerson;
     public Long firstPerson;
+    public Long legislatureYear=2012L;
     public Integer threadNumber;
     public final static String fileSuffix=".json";
     public FTPUploader ftp;
@@ -71,6 +72,7 @@ public class DeputyCrawler {
         logger.info(configuration.toString());
         maxPerson = configuration.getLong("assumptions.lastPerson", 417);
         threadNumber = configuration.getInt("working.mode.threadsNumber", 10);
+        legislatureYear=configuration.getLong("assumptions.legislatureYear",2012);
         firstPerson = configuration.getLong("assumptions.firstPerson", 1);
         if (threadNumber == 1) {
             if (configuration.getBoolean("working.mode.resumeLastCrawl"))
@@ -97,6 +99,7 @@ public class DeputyCrawler {
     public void crawl() throws IOException, InterruptedException, ConfigurationException {
         StopWatch crawlStopWatch=new StopWatch();
         DeputyPresenceParser startDateParser=new DeputyPresenceParser();
+        startDateParser.setLegislatureYear(legislatureYear);
         personStartTimestampMap= startDateParser.getAllStartDates();
         crawlStopWatch.start();
         ExecutorService executorService = Executors.newFixedThreadPool(threadNumber);
@@ -106,7 +109,7 @@ public class DeputyCrawler {
             Future future = executorService.submit(new Callable() {
                 public Object call() throws IOException, InterruptedException, ConfigurationException {
                     final DeputyPresenceParser deputyPresenceParser = new DeputyPresenceParser();
-
+                    deputyPresenceParser.setLegislatureYear(legislatureYear);
                     Person person = new Person();
                     person.setPersonId(personId);
                     deputyPresenceParser.getPersonProfile(person);
@@ -119,7 +122,7 @@ public class DeputyCrawler {
                         else
                         {
                             logger.warning("Warning: failed to determine investiture date for non-active deputy " + personId);
-                            investitureTimestamp=new DateTime(2012,12,18,0,0).getMillis();
+                            investitureTimestamp=new DateTime(legislatureYear.intValue(),12,18,0,0).getMillis();
                         }
                     }
                     person.setInvestitureTimestamp(investitureTimestamp);

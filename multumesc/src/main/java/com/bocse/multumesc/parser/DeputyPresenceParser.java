@@ -32,6 +32,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by bocse on 10.11.2015.
@@ -47,6 +49,8 @@ public class DeputyPresenceParser {
     private final int connectionRequestTimeout=30000;
     private final int connectionTimeout=30000;
     private final int socketTimeout=99000;
+    private Long legislatureYear;
+
     //private HashMap<Long, SubjectMatter> subjectMatters;
 
     public Document getProfileDocument(final Long personId) throws IOException, InterruptedException {
@@ -68,7 +72,7 @@ public class DeputyPresenceParser {
     private HttpUriRequest createProfileRequestDocument(final Long personId)
     {
 
-        final String url = "http://www.cdep.ro/pls/parlam/structura.mp?idm="+personId+"&cam=2&leg=2012&idl=1";
+        final String url = "http://www.cdep.ro/pls/parlam/structura.mp?idm="+personId+"&cam=2&leg="+legislatureYear+"&idl=1";
         final HttpGet httpGet = new HttpGet(url);
         final RequestConfig requestConfig = RequestConfig.custom()
                 .setConnectionRequestTimeout(connectionRequestTimeout).setConnectTimeout(connectionTimeout).setSocketTimeout(socketTimeout).build();
@@ -108,6 +112,7 @@ public class DeputyPresenceParser {
 //                "D"));
         nameValuePairs.add(new BasicNameValuePair("tot",
                 "1"));
+        nameValuePairs.add(new BasicNameValuePair("leg", legislatureYear.toString()));
         String paramString = URLEncodedUtils.format(nameValuePairs, "utf-8");
 
         String newUrl = url+ paramString;
@@ -438,6 +443,44 @@ public class DeputyPresenceParser {
         {
             person.setContactInformation("");
         }
+
+        for (int elementIndex=0;elementIndex<elements.size(); elementIndex++)
+        {
+            if (elements.get(elementIndex).text().contains("Luări de cuvânt"))
+            {
+                Elements subelements=elements.get(elementIndex).select("tr");
+                for (int subelementIndex=0;subelementIndex<subelements.size(); subelementIndex++) {
+                    Element subelement = subelements.get(subelementIndex);
+                    if (subelement.text().contains("Luări de cuvânt")) {
+                        int speeches = Integer.valueOf(subelement.children().last().text().split(" ")[0]);
+                        person.setSpeeches(speeches);
+                    } else if (subelement.text().contains("Declaraţii politice")) {
+                        int statements = Integer.valueOf(subelement.children().last().text().split(" ")[0]);
+                        person.setStatements(statements);
+                    } else if (subelement.text().contains("Întrebari şi interpelari")) {
+                        int inquiries = Integer.valueOf(subelement.children().last().text().split(" ")[0]);
+                        person.setInquiries(inquiries);
+                    } else if (subelement.text().contains("Motiuni")) {
+                        int motions = Integer.valueOf(subelement.children().last().text().split(" ")[0]);
+                        person.setMotions(motions);
+                    } else if (subelement.text().contains("Propuneri legislative initiate")) {
+                        Pattern p = Pattern.compile("-?\\d+");
+                        Matcher m = p.matcher(subelement.children().last().text());
+
+                        if (m.find()) {
+                            int proposedLaw = Integer.valueOf(m.group());
+                            person.setProposedLaw(proposedLaw);
+                        }
+                        if (m.find()) {
+                            int passedLaw = Integer.valueOf(m.group());
+                            person.setPassedLaw(passedLaw);
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
         elements=doc.select("html >body > table >tbody >tr > td:eq(1) > table:eq(1) > tbody > tr > td:eq(2) > table > tbody > tr > td > table > tbody > tr:eq(1)  > td:eq(1)");
         //ales deputat în circumscripţia electorală nr.22 HUNEDOARA, colegiul uninominal nr.3 data încetarii mandatului: 29 aprilie 2013 - înlocuit de: Petru-Sorin Marica
         String presentationText=elements.get(0).text().toLowerCase();
@@ -502,7 +545,7 @@ public class DeputyPresenceParser {
             Elements subelements=element.select("td");
             String startDateString=subelements.get(subelements.size()-1).text().trim();
             //19.12.2012 13:41
-            DateTime startDate=new DateTime(2012,12,18,0,0);
+            DateTime startDate=new DateTime(legislatureYear.intValue(),12,18,0,0);
             if (!startDateString.isEmpty())
             startDate=formatter.parseDateTime(startDateString);
             String url=subelements.get(1).child(0).child(0).attr("href").trim();
@@ -617,5 +660,9 @@ public class DeputyPresenceParser {
         logger.info("Received " + Arrays.toString(countiesReceived.toArray()));
         logger.info("Empty " + Arrays.toString(emptyCounty.toArray()));
         return locations;
+    }
+
+    public void setLegislatureYear(Long legislatureYear) {
+        this.legislatureYear = legislatureYear;
     }
 }

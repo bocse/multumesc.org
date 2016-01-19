@@ -18,7 +18,61 @@ public class Person  {
     private Long investitureTimestamp=-1L;
     private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
+    private Integer speeches;
+    private Integer statements;
+    private Integer inquiries;
+    private Integer motions;
+    private Integer proposedLaw;
 
+    public Integer getSpeeches() {
+        return speeches;
+    }
+
+    public void setSpeeches(Integer speeches) {
+        this.speeches = speeches;
+    }
+
+    public Integer getStatements() {
+        return statements;
+    }
+
+    public void setStatements(Integer statements) {
+        this.statements = statements;
+    }
+
+    public Integer getInquiries() {
+        return inquiries;
+    }
+
+    public void setInquiries(Integer inquiries) {
+        this.inquiries = inquiries;
+    }
+
+    public Integer getMotions() {
+        return motions;
+    }
+
+    public void setMotions(Integer motions) {
+        this.motions = motions;
+    }
+
+    public Integer getProposedLaw() {
+        return proposedLaw;
+    }
+
+    public void setProposedLaw(Integer proposedLaw) {
+        this.proposedLaw = proposedLaw;
+    }
+
+    public Integer getPassedLaw() {
+        return passedLaw;
+    }
+
+    public void setPassedLaw(Integer passedLaw) {
+        this.passedLaw = passedLaw;
+    }
+
+    private Integer passedLaw;
     private Long lastUpdateTimestamp=0L;
     private String description;
     private String contactInformation;
