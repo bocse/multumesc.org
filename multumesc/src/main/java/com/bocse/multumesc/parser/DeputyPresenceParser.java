@@ -451,7 +451,7 @@ public class DeputyPresenceParser {
                 Elements subelements=elements.get(elementIndex).select("tr");
                 for (int subelementIndex=0;subelementIndex<subelements.size(); subelementIndex++) {
                     Element subelement = subelements.get(subelementIndex);
-                    if (subelement.text().contains("Luări de cuvânt")) {
+                    if (subelement.text().contains("Luări de cuvânt") && !subelement.text().contains("Luări de cuvânt în BP")) {
                         int speeches = Integer.valueOf(subelement.children().last().text().split(" ")[0]);
                         person.setSpeeches(speeches);
                     } else if (subelement.text().contains("Declaraţii politice")) {
