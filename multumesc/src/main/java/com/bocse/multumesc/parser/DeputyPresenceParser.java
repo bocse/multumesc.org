@@ -262,8 +262,11 @@ public class DeputyPresenceParser {
                     localityMap.putIfAbsent(locality, new TreeSet<>());
                 }
                 else
-                if (parts[0].contains("municipiul ") || parts[0].contains("orasul")) {
+                if (parts[0].contains("municipiul ") || parts[0].contains("orasul") || parts[0].contains("sector")) {
                     locality=parts[0].replace("municipiul ", "").trim();
+                    if (!locality.contains("sector"))
+                        locality=locality.replaceAll("\\d","");
+                    locality=locality.replaceAll("[\\*\\)\\(]","");
                     localityMap.putIfAbsent(locality, new TreeSet<>());
                 }
                 else {
