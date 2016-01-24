@@ -111,24 +111,29 @@
             <!-- /.col-lg-12 -->
         </div>
         <div class="row" id="searchButtonContainer">
-            <button type="button" id="searchTrigger" class="btn btn-danger pull-right">Caută deputatul care te reprezintă!</button>
+            <button type="button" id="searchTrigger" class="btn btn-danger btn-lg pull-right">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                Găsește deputatul tău
+                <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span>
+            </button>
         </div>
         <div class="row" id="search" style="display: none;">
             <div class="col-lg-12">
+                <p style="font-weight: bold;"> <span class="glyphicon glyphicon-search" aria-hidden="true"></span>Caută deputatul care te reprezintă după județul, localitatea și strada ta  de domiciliu.</p>
                 <div class="input-group">
                 <select class="form-control" id="circumscription" name="circumscription">
-                    <option value="">Județ</option>
+                    <option selected="true" style="display:none;" value="">Județ</option>
                 </select>
 
-                    <select class="form-control" id="localityDropdown" name="locality">
-                        <option value="">Localitate</option>
+                    <select style="display:none;" class="form-control" id="localityDropdown" name="locality">
+                        <option selected="true" style="display:none;" value="">Localitate</option>
                     </select>
 
 
 
 
-                    <input type="text" class="form-control" id="street" placeholder="Strada">
-                    <button type="button" id="doSearch" class="btn btn-danger pull-right">Caută deputatul!</button>
+                    <input  style="display: none;" type="text" class="form-control" id="street" placeholder="Strada (ex: ferdinand, unirii, indepentei)">
+                    <button style="display: none;" type="button" id="doSearch" class="btn btn-danger pull-right">Caută deputatul!</button>
                 </div><!-- /input-group -->
             </div><!-- /.col-lg-6 -->
             <div class="col-lg-12">
@@ -427,7 +432,7 @@
     var loadedPartyData = null;
     var loadedCircumscriptionData=null;
     var preparedIndividualData = null;
-
+    var oTable=null;
     var preparedPartyData = null;
     var selectedProfileUrl='http://multumesc.org';
     var maxRed = 250;
@@ -458,7 +463,12 @@
     {
         //$('#circumscriptionList').empty();
         $.each(loadedCircumscriptionData, function (key, item) {
-            $('#circumscription').append('<option value="'+key+'">'+capitalizeFirstLetter(key)+'</option>');
+            var keyCopy=key;
+            if (key=="diaspora")
+                return ;
+            if (key.toLowerCase()=="strainatate")
+                keyCopy="DIASPORA";
+            $('#circumscription').append('<option value="'+key+'">'+capitalizeFirstLetter(keyCopy)+'</option>');
         });
     }
     function showLocalitites(chosenCircumscription)
@@ -474,7 +484,10 @@
         });
 
         $('#localityDropdown').empty();
+        if (chosenCircumscription.toLowerCase()!='strainatate')
         $('#localityDropdown').append('<option value="">Toate localitățile din județ</option>');
+        else
+            $('#localityDropdown').append('<option value="">Toate țările din diaspora</option>');
 
         for (var localitate in localitySet) {
             localityArray.push(localitate);
@@ -486,6 +499,7 @@
             $('#localityDropdown').append('<option value="' + localitate + '">' + capitalizeFirstLetter( localitate )+ '</option>');
 
         }
+        $('#localityDropdown').fadeIn(1);
     }
     function searchLocality(chosenCircumscription, locality) {
         matchedColegiu=[];
@@ -504,14 +518,17 @@
             }
             });
         });
-        if (!anyWithAddress)
+        if (!anyWithAddress && locality!="")
         {
             $('#street').fadeOut(1);
+            //$('#doSearch').fadeOut(1);
         }
         else
         {
             $('#street').fadeIn(1);
+            //$('#doSearch').fadeIn(1);
         }
+
         paintResults(matchedColegiu);
     }
     function searchAddress(chosenCircumscription, locality, street)
@@ -528,7 +545,7 @@
                             var address=addresses[addressIndex];
                             if (address.indexOf(street)>-1)
                             {
-                               matchedColegiu[locality+' - '+address]=colegiu;
+                               matchedColegiu[localitate+' - '+address]=colegiu;
                                 console.debug(address+' '+colegiu);
                             }
                         }
@@ -544,16 +561,41 @@
     function paintResults(matchedColegiu)
     {
         $('#searchResults').empty();
+        if (Object.keys(matchedColegiu).length == 0)
+        {
+            $('#searchResults').append('Nu am gasit rezultate.');
+            return ;
+        }
+        var circumscription=$('#circumscription').val();
+        var itemString='<thead> <tr> <th>Județ / Circumscripție</th> <th>Stradă/Adrese</th> <th>Colegiu</th> <th>Nume deputat</th></tr></thead>';
+        $('#searchResults').append(itemString);
         for (var address in matchedColegiu) {
             var colegiu = matchedColegiu[address];
             itemString='<tr>';
-            itemString+='<td>'+capitalizeFirstLetter($('#circumscription').val())+'</td>';
+
+            itemString+='<td>'+capitalizeFirstLetter(circumscription)+'</td>';
             itemString+='<td>'+capitalizeFirstLetter(address)+'</td>';
             itemString+='<td>'+colegiu+'</td>';
-            itemString+='<td>'+'Nume deputat'+'</td>';
+            var deputyName=searchDeputyByCircumscription(circumscription, colegiu)
+            var deputyString='<a href="#deputyDetailsTab" class="deputyDetailsLink" deputyname="'+deputyName+'">'+deputyName+'</a>';
+            itemString+='<td>'+deputyString+'</td>';
             itemString+='</tr>';
             $('#searchResults').append(itemString);
         }
+    }
+    function searchDeputyByCircumscription(circumscription, colegiu)
+    {
+        var localResult=null;
+        if (circumscription.toLowerCase()=="strainatate")
+            circumscription='diaspora';
+        $.each(loadedIndividualData, function (key, item) {
+            if (item.colegiu == colegiu && (circumscription==item.county))
+            {
+                localResult=key;
+                return localResult;
+            }
+        });
+        return localResult;
     }
     function profileData(nume) {
         var item = loadedIndividualData[nume];
@@ -769,7 +811,7 @@
 
 
     function renderTable() {
-        $('#dataTables-example').DataTable({
+        oTable=$('#dataTables-example').DataTable({
             data: preparedIndividualData,
             "language": {
                 "decimal": "",
@@ -1031,7 +1073,7 @@
         });
 
         $('#searchTrigger').click(function () {
-            $('#searchTrigger').text("Se încarcă ...");
+            $('#searchTrigger').text("Se încarcă 35,000+ de străzi din 2,500+ localități ...");
             $.ajax({
                 url: serviceURL + 'data/circumscription.min.json',
                 type: 'GET',
@@ -1056,7 +1098,42 @@
 
         $('#circumscription').change(function () {
             console.debug($('#circumscription').val());
-            showLocalitites($('#circumscription').val());
+            if ($('#circumscription').val()!='bucuresti')
+            {
+                showLocalitites($('#circumscription').val());
+                if ($('#circumscription').val()!='STRAINATATE')
+                {
+                    $('#street').fadeIn(1);
+                }
+                else
+                {
+                    $('#street').fadeOut(1);
+                }
+
+            }
+            else
+            {
+                $('#localityDropdown').fadeOut(1);
+                //$('#doSearch').fadeIn(1);
+                $('#street').fadeIn(1);
+
+
+            }
+            $('#searchResults').empty();
+        });
+        $('#street').keyup(function() {
+            if ($('#street').val().length>2 )
+            {
+                searchAddress($('#circumscription').val(), $('#localityDropdown').val(), $('#street').val());
+            }
+        });
+
+        $('#street').keypress(function(e) {
+           if (e.which == 13)
+           {
+               searchAddress($('#circumscription').val(), $('#localityDropdown').val(), $('#street').val());
+
+           }
         });
         $('#localityDropdown').change(function () {
             console.debug($('#circumscription').val());

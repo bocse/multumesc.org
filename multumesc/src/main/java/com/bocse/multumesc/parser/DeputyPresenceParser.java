@@ -230,6 +230,8 @@ public class DeputyPresenceParser {
         if (doc == null)
             return localityMap;
         String locality="";
+        if (county.toLowerCase().equals("bucuresti"))
+            locality="sector 1 - bucuresti";
         Elements elements = doc.select("body > div > div > table > tbody > tr:eq(4) > td > p");
         for (int elementIndex=1; elementIndex<elements.size(); elementIndex++){
             Element element=elements.get(elementIndex);
@@ -241,15 +243,15 @@ public class DeputyPresenceParser {
 
                     String[] sate = parts[1].split(",");
                     for (String sat : sate) {
-                        locality=sat.trim();
-                        localityMap.putIfAbsent(locality, new TreeSet<>());
+                        //locality=sat.trim();
+                        localityMap.putIfAbsent(sat.trim(), new TreeSet<>());
                     }
                 } else if (parts[0].contains("localitate componenta") || parts[0].contains("localitati componente")) {
 
                     String[] comune = parts[1].split(",");
                     for (String comuna : comune) {
-                        locality=comuna.trim();
-                        localityMap.putIfAbsent(locality, new TreeSet<>());
+                        //locality=
+                        localityMap.putIfAbsent(comuna.trim(), new TreeSet<>());
                     }
                 } else {
                     logger.warning("Unknown location type, assuming street level" + text);
@@ -258,14 +260,14 @@ public class DeputyPresenceParser {
                 }
             } else {
                 if (parts[0].contains("comuna ")) {
-                    locality=parts[0].replace("comuna ", "").trim();
-                    localityMap.putIfAbsent(locality, new TreeSet<>());
+                    //locality=
+                    localityMap.putIfAbsent(parts[0].replace("comuna ", "").trim(), new TreeSet<>());
                 }
                 else
-                if (parts[0].contains("municipiul ") || parts[0].contains("orasul") || parts[0].contains("sector")) {
+                if (parts[0].contains("municipiul ") || parts[0].contains("orasul") || parts[0].startsWith("sector")) {
                     locality=parts[0].replace("municipiul ", "").trim();
                     if (!locality.contains("sector"))
-                        locality=locality.replaceAll("\\d","");
+                        locality = locality.replaceAll("\\d","");
                     locality=locality.replaceAll("[\\*\\)\\(]","");
                     localityMap.putIfAbsent(locality, new TreeSet<>());
                 }
