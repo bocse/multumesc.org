@@ -444,7 +444,6 @@
     var errorCount = null;
     var succesful = null;
 
-
     function parseParameter(val) {
         var result = null,
                 tmp = [];
@@ -474,8 +473,8 @@
     function showLocalitites(chosenCircumscription)
     {
 
-        localitySet=[];
-        localityArray=[];
+        var localitySet=[];
+        var localityArray=[];
         $.each(loadedCircumscriptionData[chosenCircumscription], function (key, item) {
             $.each(item, function (localitate, biproduct) {
                 localitySet[localitate]=true;
@@ -502,8 +501,8 @@
         $('#localityDropdown').fadeIn(1);
     }
     function searchLocality(chosenCircumscription, locality) {
-        matchedColegiu=[];
-        anyWithAddress=false;
+        var matchedColegiu=[];
+        var anyWithAddress=false;
         $.each(loadedCircumscriptionData[chosenCircumscription], function (colegiu, localities) {
             $.each(localities, function (localitate, addresses) {
                 if (localitate == locality) {
@@ -533,7 +532,9 @@
     }
     function searchAddress(chosenCircumscription, locality, street)
     {
-        matchedColegiu=[];
+        if (chosenCircumscription=='bucuresti')
+        {locality="";}
+        var matchedColegiu=[];
         street=street.toLowerCase();
         $.each(loadedCircumscriptionData[chosenCircumscription], function (colegiu, localities) {
             $.each(localities, function (localitate, addresses) {
@@ -545,8 +546,15 @@
                             var address=addresses[addressIndex];
                             if (address.indexOf(street)>-1)
                             {
-                               matchedColegiu[localitate+' - '+address]=colegiu;
-                                console.debug(address+' '+colegiu);
+                                if (chosenCircumscription!='bucuresti') {
+                                    matchedColegiu[localitate + ' - ' + address] = colegiu;
+
+                                }
+                                else
+                                {
+                                    matchedColegiu[address] = colegiu;
+                                }
+                                console.debug(address + ' ' + colegiu);
                             }
                         }
                     }
@@ -859,7 +867,7 @@
             stateSave: true,
             iDisplayLength: 10,
             stateDuration: 43200,
-            "order": [[4, "desc"]]
+            "order": [5, "desc"]
         });
     }
 
@@ -1098,21 +1106,17 @@
 
         $('#circumscription').change(function () {
             console.debug($('#circumscription').val());
-            if ($('#circumscription').val()!='bucuresti')
-            {
+            if ($('#circumscription').val() != 'bucuresti') {
                 showLocalitites($('#circumscription').val());
-                if ($('#circumscription').val()!='STRAINATATE')
-                {
+                if ($('#circumscription').val() != 'STRAINATATE') {
                     $('#street').fadeIn(1);
                 }
-                else
-                {
+                else {
                     $('#street').fadeOut(1);
                 }
 
             }
-            else
-            {
+            else {
                 $('#localityDropdown').fadeOut(1);
                 //$('#doSearch').fadeIn(1);
                 $('#street').fadeIn(1);
@@ -1121,19 +1125,17 @@
             }
             $('#searchResults').empty();
         });
-        $('#street').keyup(function() {
-            if ($('#street').val().length>2 )
-            {
+        $('#street').keyup(function () {
+            if ($('#street').val().length > 2) {
                 searchAddress($('#circumscription').val(), $('#localityDropdown').val(), $('#street').val());
             }
         });
 
-        $('#street').keypress(function(e) {
-           if (e.which == 13)
-           {
-               searchAddress($('#circumscription').val(), $('#localityDropdown').val(), $('#street').val());
+        $('#street').keypress(function (e) {
+            if (e.which == 13) {
+                searchAddress($('#circumscription').val(), $('#localityDropdown').val(), $('#street').val());
 
-           }
+            }
         });
         $('#localityDropdown').change(function () {
             console.debug($('#circumscription').val());
