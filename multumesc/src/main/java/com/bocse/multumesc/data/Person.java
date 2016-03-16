@@ -15,6 +15,7 @@ public class Person  {
     private String pictureURL;
     private String currentParty;
     private String email;
+    private List<DNARecord> recordList;
     private Long investitureTimestamp=-1L;
     private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
@@ -273,5 +274,13 @@ public class Person  {
         if (investitureTimestamp==null)
             throw new IllegalStateException("Investiture date cannot be null");
         this.investitureTimestamp = investitureTimestamp;
+    }
+
+    public List<DNARecord> getRecordList() {
+        return recordList;
+    }
+
+    public void setRecordList(List<DNARecord> recordList) {
+        this.recordList = recordList;
     }
 }

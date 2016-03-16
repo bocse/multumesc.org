@@ -1,5 +1,6 @@
 package com.bocse.multumesc.parser;
 
+import com.bocse.multumesc.data.DNARecord;
 import com.bocse.multumesc.requester.HttpRequester;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -76,9 +77,13 @@ public class DNAParser {
         logger.info("Retrieved PNA session "+pnaSession);
     }
 
-    public void doSearch(String fullName) throws IOException, InterruptedException {
+    public List<DNARecord> doSearch(String firstName, String lastName, Boolean deputat) throws IOException, InterruptedException {
         if (pnaSession == null)
             init();
+        List<DNARecord> records=new ArrayList<>();
+        String fullName=(lastName+" "+firstName).toLowerCase();
+        if (deputat)
+            fullName=fullName+" deputat";
         final String domain="http://www.pna.ro";
         final String url = domain+"/faces/index.xhtml";
         final HttpPost httpPost = new HttpPost(url);
@@ -116,13 +121,51 @@ public class DNAParser {
             if (parts.size()==2)
             {
                 String dateString=parts.get(0).text();
-                String link=parts.get(1).select("a").attr("href");
+                String recordUrl=parts.get(1).select("a").attr("href");
                 String title=parts.get(1).select("a").text();
-                logger.info(dateString+"\t"+title+"\t"+link);
+                DNARecord dnaRecord=new DNARecord();
+                dnaRecord.setLink(domain+recordUrl);
+                dnaRecord.setDate(dateString);
+                dnaRecord.setTitle(title);
+                records.add(dnaRecord);
+                logger.info(dateString+"\t"+title+"\t"+recordUrl);
             }
 
         }
+        return records;
     }
 
+    public Boolean doValidation(String firstName, String lastName, DNARecord record) throws IOException {
+        firstName=firstName.replaceAll("[^a-zA-Z ]", "").toLowerCase();
+        lastName=lastName.replaceAll("[^a-zA-Z ]", "").toLowerCase();
+
+        final HttpGet httpGet = new HttpGet(record.getLink());
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(connectionRequestTimeout).setConnectTimeout(connectionTimeout).setSocketTimeout(socketTimeout).build();
+        httpGet.setConfig(requestConfig);
+        logger.info("Executing request " + httpGet.getRequestLine());
+
+        httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
+        httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36");
+        Document document = client.execute(httpGet, new ResponseHandler<Document>() {
+            @Override
+            public Document handleResponse(HttpResponse httpResponse) throws ClientProtocolException, IOException {
+                HttpEntity entity = httpResponse.getEntity();
+                Document doc = Jsoup.parse(entity.getContent(), "UTF-8","");
+                //String StringFromInputStream = IOUtils.toString(entity.getContent(), "UTF-8");
+                //logger.info(StringFromInputStream);
+                return doc;
+            }
+        }, httpContext);
+        Elements elements=document.select("span");
+        for (Element paragraph : elements)
+        {
+            String paragraphText=paragraph.text().replaceAll("[^a-zA-Z ]", "").toLowerCase();
+            //if (paragraphText.contains(firstName) && paragraphText.contains(lastName) && paragraphText.contains("deputat"))
+            if (paragraphText.contains(lastName+" "+firstName) && paragraphText.contains("deputat"))
+                return true;
+        }
+        return false;
+    }
 
 }
