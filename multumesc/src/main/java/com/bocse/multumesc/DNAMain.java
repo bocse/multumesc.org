@@ -18,8 +18,8 @@ public class DNAMain {
         DNAParser dnaParser=new DNAParser();
         //dnaParser.init();
         Person person=new Person();
-        person.setFirstName("Dan Cristian");
-        person.setLastName("Popescu");
+        person.setFirstName("Sebastian-Aurelian");
+        person.setLastName("Ghita");
     List<DNARecord> recordList=dnaParser.doSearch(person,false);
         Integer validCounter=0;
         for (DNARecord record: person.getConfirmedRecordList())

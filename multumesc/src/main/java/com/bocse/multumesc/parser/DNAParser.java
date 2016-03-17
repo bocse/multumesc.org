@@ -3,6 +3,7 @@ package com.bocse.multumesc.parser;
 import com.bocse.multumesc.data.DNARecord;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.requester.HttpRequester;
+import com.bocse.multumesc.utils.TextUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -82,7 +83,7 @@ public class DNAParser {
         if (pnaSession == null)
             init();
         List<DNARecord> records=new ArrayList<>();
-        String fullName=(person.getLastName()+" "+person.getFirstName()).toLowerCase();
+        String fullName= (TextUtils.flattenToAscii(person.getLastName() + " " + person.getFirstName()).toLowerCase()).replaceAll("[^a-zA-Z ]", " ");
         if (deputat)
             fullName=fullName+" deputat";
         final String domain="http://www.pna.ro";
@@ -138,8 +139,8 @@ public class DNAParser {
     }
 
     public Boolean doValidation(Person person, DNARecord record) throws IOException {
-        String firstName=person.getFirstName().replaceAll("[^a-zA-Z ]", "").toLowerCase();
-        String lastName=person.getLastName().replaceAll("[^a-zA-Z ]", "").toLowerCase();
+        String firstName=TextUtils.flattenToAscii(person.getFirstName()).replaceAll("[^a-zA-Z ]", " ").toLowerCase();
+        String lastName = TextUtils.flattenToAscii(person.getLastName()).replaceAll("[^a-zA-Z ]", " ").toLowerCase();
 
         final HttpGet httpGet = new HttpGet(record.getLink());
         final RequestConfig requestConfig = RequestConfig.custom()
@@ -162,7 +163,7 @@ public class DNAParser {
         Elements elements=document.select("span");
         for (Element paragraph : elements)
         {
-            String paragraphText=paragraph.text().replaceAll("[^a-zA-Z ]", "").toLowerCase();
+            String paragraphText=TextUtils.flattenToAscii(paragraph.text()).replaceAll("[^a-zA-Z ]", " ").toLowerCase();
             //if (paragraphText.contains(firstName) && paragraphText.contains(lastName) && paragraphText.contains("deputat"))
             if (paragraphText.contains(lastName+" "+firstName)) {
                 if (paragraphText.contains("deputat")) {
