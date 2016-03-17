@@ -15,7 +15,10 @@ public class Person  {
     private String pictureURL;
     private String currentParty;
     private String email;
-    private List<DNARecord> recordList;
+    private String birthday;
+    private Long birthdayTimestamp;
+    private List<DNARecord> confirmedRecordList=new ArrayList<>();
+    private List<DNARecord> otherRecordList=new ArrayList<>();
     private Long investitureTimestamp=-1L;
     private List<String> allPartyList =new ArrayList<>();
     private SortedMap<Long, Vote> voteMap=new TreeMap<>();
@@ -276,11 +279,37 @@ public class Person  {
         this.investitureTimestamp = investitureTimestamp;
     }
 
-    public List<DNARecord> getRecordList() {
-        return recordList;
+
+
+    public List<DNARecord> getConfirmedRecordList() {
+        return confirmedRecordList;
     }
 
-    public void setRecordList(List<DNARecord> recordList) {
-        this.recordList = recordList;
+    public void setConfirmedRecordList(List<DNARecord> confirmedRecordList) {
+        this.confirmedRecordList = confirmedRecordList;
+    }
+
+    public List<DNARecord> getOtherRecordList() {
+        return otherRecordList;
+    }
+
+    public void setOtherRecordList(List<DNARecord> otherRecordList) {
+        this.otherRecordList = otherRecordList;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
+    public Long getBirthdayTimestamp() {
+        return birthdayTimestamp;
+    }
+
+    public void setBirthdayTimestamp(Long birthdayTimestamp) {
+        this.birthdayTimestamp = birthdayTimestamp;
     }
 }

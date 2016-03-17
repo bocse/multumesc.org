@@ -2,6 +2,7 @@ package com.bocse.multumesc;
 
 
 import com.bocse.multumesc.data.DNARecord;
+import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.parser.DNAParser;
 
 import java.io.IOException;
@@ -16,17 +17,23 @@ public class DNAMain {
     public static void main(String[] args) throws IOException, InterruptedException {
         DNAParser dnaParser=new DNAParser();
         //dnaParser.init();
-    List<DNARecord> recordList=dnaParser.doSearch("Dan Cristian","Popescu",false);
+        Person person=new Person();
+        person.setFirstName("Dan Cristian");
+        person.setLastName("Popescu");
+    List<DNARecord> recordList=dnaParser.doSearch(person,false);
         Integer validCounter=0;
-        for (DNARecord record: recordList)
+        for (DNARecord record: person.getConfirmedRecordList())
         {
-            Boolean isValid=dnaParser.doValidation("Dan Cristian", "Popescu", record);
-            logger.info(String.valueOf(isValid) + " \t" + record.getLink());
-            if (isValid) {
-                validCounter++;
-            }
+            //Boolean isValid=dnaParser.doValidation("Dan Cristian", "Popescu", record);
+            logger.info("Confirmed:  "+ record.getLink());
+
         }
-        logger.info("Found "+recordList.size()+ " records, "+validCounter+ " valid.");
+        for (DNARecord record: person.getOtherRecordList())
+        {
+            //Boolean isValid=dnaParser.doValidation("Dan Cristian", "Popescu", record);
+            logger.info("Other:  "+ record.getLink());
+
+        }
 
     }
 }

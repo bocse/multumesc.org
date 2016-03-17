@@ -22,6 +22,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,6 +31,10 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -394,7 +399,45 @@ public class DeputyPresenceParser {
         person.setFullName(name);
         person.setFirstName(NameUtils.getFirstNames(name));
         person.setLastName(NameUtils.getLastName(name));
+        elements=doc.select("#itm974 > td");
+        if (elements.size()>0)
+        {
+            String birthdayElement=elements.text().trim().toLowerCase();
+            int birthdayIndex=birthdayElement.indexOf("n. ");
+            if (birthdayIndex>-1)
+            {
+                String birthdayText=birthdayElement.substring(birthdayIndex+3);
+                Map<Long, String> monthNameMap = new HashMap<>();
+                monthNameMap.put(1L, "ian. ");
+                monthNameMap.put(2L, "feb. ");
+                monthNameMap.put(3L, "mar. ");
+                monthNameMap.put(4L, "apr. ");
+                monthNameMap.put(5L, "mai ");
+                monthNameMap.put(6L, "iun. ");
+                monthNameMap.put(7L, "iul. ");
+                monthNameMap.put(8L, "aug. ");
+                monthNameMap.put(9L, "sep. ");
+                monthNameMap.put(10L, "oct. ");
+                monthNameMap.put(11L, "noi. ");
+                monthNameMap.put(12L, "dec. ");
+                java.time.format.DateTimeFormatter fmt = new DateTimeFormatterBuilder()
+                        .appendPattern("d ")
+                        .appendText(ChronoField.MONTH_OF_YEAR, monthNameMap)
+                        .appendPattern("yyyy")
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                        .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                        .toFormatter();
 
+                java.time.LocalDateTime dt = LocalDateTime.parse(birthdayText, fmt);
+                Long birthdayTimestamp=dt.toInstant(ZoneOffset.ofTotalSeconds(0)).toEpochMilli();
+                DateTime dt2 = new DateTime(birthdayTimestamp);
+                DateTimeFormatter fmt2 = DateTimeFormat.forPattern("yyyy-MM-dd");
+                String dtStr = fmt2.print(dt2);
+                person.setBirthdayTimestamp(birthdayTimestamp/1000);
+                person.setBirthday(dtStr);
+                logger.info("Birthday: "+birthdayTimestamp);
+            }
+        }
         elements=doc.select("#itm974 > td > a ");
         if (elements.size()>=1)
             person.setPictureURL("http://www.cdep.ro"+elements.get(0).attr("href"));

@@ -5,6 +5,7 @@ import com.bocse.multumesc.MultumescDeputyParallelMain;
 import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.data.Vote;
 import com.bocse.multumesc.data.VoteTypes;
+import com.bocse.multumesc.parser.DNAParser;
 import com.bocse.multumesc.parser.DeputyPresenceParser;
 import com.bocse.multumesc.serializer.JsonSerializer;
 import com.bocse.multumesc.statistics.StatsProcessor;
@@ -50,6 +51,7 @@ public class DeputyCrawler {
     public final static String fileSuffix=".json";
     public FTPUploader ftp;
     public S3Uploader s3;
+    public AtomicLong penals=new AtomicLong(0);
 
     public DateTime lastUpdated;
     public DeputyCrawler(String configFile, String stateFile) {
@@ -109,10 +111,17 @@ public class DeputyCrawler {
             Future future = executorService.submit(new Callable() {
                 public Object call() throws IOException, InterruptedException, ConfigurationException {
                     final DeputyPresenceParser deputyPresenceParser = new DeputyPresenceParser();
+                    final DNAParser dnaParser= new DNAParser();
                     deputyPresenceParser.setLegislatureYear(legislatureYear);
                     Person person = new Person();
                     person.setPersonId(personId);
                     deputyPresenceParser.getPersonProfile(person);
+                    dnaParser.doSearch(person, false);
+                    if (person.getConfirmedRecordList().size()>0 || person.getOtherRecordList().size()>0)
+                    {
+                        penals.incrementAndGet();
+                        logger.info("Indice de penalitate: "+ (person.getConfirmedRecordList().size()+person.getOtherRecordList().size()));
+                    }
                     Long investitureTimestamp=personStartTimestampMap.get(personId);
                     if (investitureTimestamp==null)
                     {
@@ -191,7 +200,7 @@ public class DeputyCrawler {
                         state.setProperty("partialCrawls.lastProfile", personId);
                     }
                     Thread.sleep((int) (1 + System.nanoTime() % 1000));
-
+                    logger.info("Penals: "+penals.get()+ " / "+person.getPersonId()  );
                     return person;
 
                 }

@@ -7,7 +7,8 @@ public class DNARecord {
     private String date;
     private String title;
     private String link;
-    private Boolean validation;
+    private Boolean strongValidation=false;
+    private Boolean weakValidation=false;
 
     public String getDate() {
         return date;
@@ -33,13 +34,20 @@ public class DNARecord {
         this.link = link;
     }
 
-    public Boolean getValidation() {
-        return validation;
+
+    public Boolean getStrongValidation() {
+        return strongValidation;
     }
 
-    public void setValidation(Boolean validation) {
-        this.validation = validation;
+    public void setStrongValidation(Boolean strongValidation) {
+        this.strongValidation = strongValidation;
     }
 
+    public Boolean getWeakValidation() {
+        return weakValidation;
+    }
 
+    public void setWeakValidation(Boolean weakValidation) {
+        this.weakValidation = weakValidation;
+    }
 }

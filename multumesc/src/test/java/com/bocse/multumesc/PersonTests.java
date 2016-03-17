@@ -41,11 +41,11 @@ public class PersonTests
      */
     public void testApp() throws IOException, InterruptedException {
 
-        for (Long personId=85L; personId<=85L; personId++) {
+        for (Long personId=1L; personId<=400L; personId++) {
 
             DeputyPresenceParser pp = new DeputyPresenceParser();
             Counties counties=new Counties();
-
+            pp.setLegislatureYear(2012L);
             Person person = new Person();
             person.setPersonId(personId);
             pp.getPersonProfile(person);

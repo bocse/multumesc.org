@@ -1,6 +1,7 @@
 package com.bocse.multumesc.parser;
 
 import com.bocse.multumesc.data.DNARecord;
+import com.bocse.multumesc.data.Person;
 import com.bocse.multumesc.requester.HttpRequester;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -77,11 +78,11 @@ public class DNAParser {
         logger.info("Retrieved PNA session "+pnaSession);
     }
 
-    public List<DNARecord> doSearch(String firstName, String lastName, Boolean deputat) throws IOException, InterruptedException {
+    public List<DNARecord> doSearch(Person person, Boolean deputat) throws IOException, InterruptedException {
         if (pnaSession == null)
             init();
         List<DNARecord> records=new ArrayList<>();
-        String fullName=(lastName+" "+firstName).toLowerCase();
+        String fullName=(person.getLastName()+" "+person.getFirstName()).toLowerCase();
         if (deputat)
             fullName=fullName+" deputat";
         final String domain="http://www.pna.ro";
@@ -127,17 +128,18 @@ public class DNAParser {
                 dnaRecord.setLink(domain+recordUrl);
                 dnaRecord.setDate(dateString);
                 dnaRecord.setTitle(title);
+                doValidation(person, dnaRecord);
                 records.add(dnaRecord);
-                logger.info(dateString+"\t"+title+"\t"+recordUrl);
+                //logger.info(dateString+"\t"+title+"\t"+recordUrl);
             }
 
         }
         return records;
     }
 
-    public Boolean doValidation(String firstName, String lastName, DNARecord record) throws IOException {
-        firstName=firstName.replaceAll("[^a-zA-Z ]", "").toLowerCase();
-        lastName=lastName.replaceAll("[^a-zA-Z ]", "").toLowerCase();
+    public Boolean doValidation(Person person, DNARecord record) throws IOException {
+        String firstName=person.getFirstName().replaceAll("[^a-zA-Z ]", "").toLowerCase();
+        String lastName=person.getLastName().replaceAll("[^a-zA-Z ]", "").toLowerCase();
 
         final HttpGet httpGet = new HttpGet(record.getLink());
         final RequestConfig requestConfig = RequestConfig.custom()
@@ -162,8 +164,19 @@ public class DNAParser {
         {
             String paragraphText=paragraph.text().replaceAll("[^a-zA-Z ]", "").toLowerCase();
             //if (paragraphText.contains(firstName) && paragraphText.contains(lastName) && paragraphText.contains("deputat"))
-            if (paragraphText.contains(lastName+" "+firstName) && paragraphText.contains("deputat"))
+            if (paragraphText.contains(lastName+" "+firstName)) {
+                if (paragraphText.contains("deputat")) {
+                    record.setStrongValidation(true);
+                    record.setWeakValidation(true);
+                    person.getConfirmedRecordList().add(record);
+                }
+                else
+                {
+                    record.setWeakValidation(true);
+                    person.getOtherRecordList().add(record);
+                }
                 return true;
+            }
         }
         return false;
     }
