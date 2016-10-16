@@ -1,29 +1,23 @@
-# README #
+# Multumesc.org back-end analytics #
+This is the Java application used to acquire data from the Romanian Chamber of Deputies website and analyze it into presence and involvement statistics.
 
-This is a crawler for cdep.ro and senat.ro based on jsoup 
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+Recommended architecture:
+http://bogdanbocse.com/2016/01/multumesc-org-simple-efficient-scalable-cloud-architecture-of-an-mvp/
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+Pre-requisites:
+1. JDK 1.8
+2. Maven
+3. (optional)IntelliJ IDEA
+
+Pull, get the maven dependencies and run the main class.
 
 ### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
+Please mention the source when using the code.
 
 ### Who do I talk to? ###
 
-* Repo owner or admin
-* Other community or team contact
+Email: bogdan@bocse.ro
+http://bogdanbocse.com
+
