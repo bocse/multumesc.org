@@ -1,0 +1,7 @@
+
+Multumesc.org Back-end Updater
+Copyright 2016 Bogdan Bocse
+
+This product includes software developed by Bogdan Bocse ( http://bogdanbocse.com/ ).
+
+Licensing details of each library used are contained within each import. 
