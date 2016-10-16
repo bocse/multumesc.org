@@ -19,5 +19,5 @@ Please mention the source when using the code.
 ### Who do I talk to? ###
 
 Email: bogdan@bocse.ro
-http://bogdanbocse.com
+Web: http://bogdanbocse.com
 
