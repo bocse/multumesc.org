@@ -36,7 +36,7 @@ public class FTPTest
      * Rigourous Test :-)
      */
     public void testFTP() throws IOException, InterruptedException {
-        FTPUploader ftp=new FTPUploader("ftp.bogdanbocse.com", 21, "multumesc@bogdanbocse.com", "Anaare2mere!");
+        FTPUploader ftp=new FTPUploader("ftp.XXXX.com", 21, "YYYY", "ZZZZZ");
         //ftp.init();
         ftp.uploadFileAsync("/data/personStats.json", new File("/home/bocse/cdep/personStatsTogether.txt"));
         ftp.disconnect();
